@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Find a Doctor - Healthcare System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .doctor-card {
+        transition: all 0.3s;
+        height: 100%;
+    }
+    .doctor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .filter-section {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2>Find a Doctor</h2>
+        <p class="text-muted">Search for doctors by specialization and book appointments online</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="filter-section">
+            <h5>Filter Options</h5>
+            <form method="get" action="{% url 'doctor_search' %}">
+                <div class="mb-3">
+                    <label for="specialization" class="form-label">Specialization</label>
+                    <select class="form-select" id="specialization" name="specialization">
+                        <option value="">All Specializations</option>
+                        {% for spec_code, spec_name in specializations %}
+                            <option value="{{ spec_code }}" {% if selected_specialization == spec_code %}selected{% endif %}>{{ spec_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="experience" class="form-label">Minimum Experience (Years)</label>
+                    <select class="form-select" id="experience" name="experience">
+                        <option value="">Any Experience</option>
+                        <option value="1" {% if min_experience == 1 %}selected{% endif %}>1+ Years</option>
+                        <option value="3" {% if min_experience == 3 %}selected{% endif %}>3+ Years</option>
+                        <option value="5" {% if min_experience == 5 %}selected{% endif %}>5+ Years</option>
+                        <option value="10" {% if min_experience == 10 %}selected{% endif %}>10+ Years</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="max_fee" class="form-label">Maximum Fee ($)</label>
+                    <input type="number" class="form-control" id="max_fee" name="max_fee" value="{{ max_fee }}" min="0" step="10">
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="row">
+            {% if doctors %}
+                {% for doctor in doctors %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card doctor-card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ doctor }}</h5>
+                                <p class="card-text"><strong>Specialization:</strong> {{ doctor.get_specialization_display }}</p>
+                                <p class="card-text"><strong>Experience:</strong> {{ doctor.years_of_experience }} years</p>
+                                <p class="card-text"><strong>Fee:</strong> ${{ doctor.consultation_fee }}</p>
+                                
+                                {% if doctor.bio %}
+                                    <p class="card-text text-muted small">{{ doctor.bio|truncatechars:100 }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0">
+                                <a href="{% url 'doctor_detail' doctor.id %}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                                <a href="{% url 'book_appointment_with_doctor' doctor.id %}" class="btn btn-primary btn-sm">Book Appointment</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        No doctors found matching your criteria. Please try different filters.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if doctors.has_other_pages %}
+            <nav aria-label="Doctor search pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if doctors.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if selected_specialization %}&specialization={{ selected_specialization }}{% endif %}{% if min_experience %}&experience={{ min_experience }}{% endif %}{% if max_fee %}&max_fee={{ max_fee }}{% endif %}" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ doctors.previous_page_number }}{% if selected_specialization %}&specialization={{ selected_specialization }}{% endif %}{% if min_experience %}&experience={{ min_experience }}{% endif %}{% if max_fee %}&max_fee={{ max_fee }}{% endif %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for i in doctors.paginator.page_range %}
+                        {% if doctors.number == i %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                        {% elif i > doctors.number|add:'-3' and i < doctors.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}{% if selected_specialization %}&specialization={{ selected_specialization }}{% endif %}{% if min_experience %}&experience={{ min_experience }}{% endif %}{% if max_fee %}&max_fee={{ max_fee }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if doctors.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ doctors.next_page_number }}{% if selected_specialization %}&specialization={{ selected_specialization }}{% endif %}{% if min_experience %}&experience={{ min_experience }}{% endif %}{% if max_fee %}&max_fee={{ max_fee }}{% endif %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ doctors.paginator.num_pages }}{% if selected_specialization %}&specialization={{ selected_specialization }}{% endif %}{% if min_experience %}&experience={{ min_experience }}{% endif %}{% if max_fee %}&max_fee={{ max_fee }}{% endif %}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

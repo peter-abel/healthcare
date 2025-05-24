@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Medical Record - Healthcare System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'patient_dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'medical_records_list' %}">Medical Records</a></li>
+                <li class="breadcrumb-item active">Record Details</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Medical Record - {{ medical_record.created_at|date:"M d, Y" }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Doctor Information</h6>
+                        <hr>
+                        <p><strong>Doctor:</strong> {{ medical_record.doctor }}</p>
+                        <p><strong>Specialization:</strong> {{ medical_record.doctor.get_specialization_display }}</p>
+                        {% if medical_record.appointment %}
+                            <p><strong>Appointment Date:</strong> {{ medical_record.appointment.appointment_date }}</p>
+                            <p><strong>Appointment Time:</strong> {{ medical_record.appointment.appointment_time }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Record Information</h6>
+                        <hr>
+                        <p><strong>Created:</strong> {{ medical_record.created_at }}</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0">Diagnosis</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ medical_record.diagnosis }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0">Treatment</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ medical_record.treatment }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if medical_record.medications %}
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0">Medications</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ medical_record.medications }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if medical_record.notes %}
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0">Doctor's Notes</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ medical_record.notes }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="{% url 'medical_records_list' %}" class="btn btn-secondary">Back to Records</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

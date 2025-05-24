@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment with {{ doctor }} - Healthcare System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .time-slot {
+        display: inline-block;
+        margin: 5px;
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .time-slot:hover {
+        background-color: #e9ecef;
+    }
+    .time-slot.selected {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+    .time-slot.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: #f8f9fa;
+    }
+    .doctor-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'doctor_search' %}">Find a Doctor</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'doctor_detail' doctor.id %}">Doctor Profile</a></li>
+                <li class="breadcrumb-item active">Book Appointment</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-md-12">
+        <h2>Book an Appointment with {{ doctor }}</h2>
+        <p class="text-muted">Select a date and time to schedule your appointment</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="doctor-info">
+            <h4>{{ doctor }}</h4>
+            <p class="text-muted">{{ doctor.get_specialization_display }}</p>
+            <hr>
+            <p><strong>Experience:</strong> {{ doctor.years_of_experience }} years</p>
+            <p><strong>Consultation Fee:</strong> ${{ doctor.consultation_fee }}</p>
+            
+            <h5 class="mt-4">Weekly Schedule</h5>
+            {% if schedules %}
+                <ul class="list-group list-group-flush">
+                    {% for schedule in schedules %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ schedule.get_day_of_week_display }}</strong>
+                        </div>
+                        <div>
+                            {{ schedule.start_time }} - {{ schedule.end_time }}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-center">No schedule information available.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <form method="post" id="appointmentForm">
+            {% csrf_token %}
+            <input type="hidden" name="appointment_date" id="selected_date">
+            <input type="hidden" name="appointment_time" id="selected_time">
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Step 1: Select Date</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <input type="text" class="form-control" id="appointment_date_picker" placeholder="Select Date">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Step 2: Select Time</h5>
+                </div>
+                <div class="card-body">
+                    <div id="timeSlots" class="text-center">
+                        <p>Please select a date first</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Step 3: Appointment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Reason for Visit</label>
+                        <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Additional Notes (Optional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-5">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg" id="bookButton" disabled>Book Appointment</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const datePicker = document.getElementById('appointment_date_picker');
+        const timeSlotsContainer = document.getElementById('timeSlots');
+        const bookButton = document.getElementById('bookButton');
+        
+        let selectedDate = null;
+        let selectedTime = null;
+        
+        // For demo purposes, we'll use hardcoded available days (Monday-Friday)
+        // In a real app, this would come from the doctor's schedule
+        const availableDays = [0, 1, 2, 3, 4]; // Monday to Friday
+        
+        // Initialize date picker
+        const datePickerInstance = flatpickr(datePicker, {
+            minDate: 'today',
+            dateFormat: 'Y-m-d',
+            disable: [
+                function(date) {
+                    // Disable days the doctor is not available
+                    const dayOfWeek = date.getDay();
+                    // Convert from JS day (0=Sunday) to our day (0=Monday)
+                    const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                    
+                    // Check if doctor has a schedule for this day
+                    return !availableDays.includes(adjustedDay);
+                }
+            ],
+            onChange: function(selectedDates, dateStr) {
+                selectedDate = dateStr;
+                document.getElementById('selected_date').value = selectedDate;
+                
+                // Load time slots for selected date
+                loadTimeSlots(selectedDate);
+            }
+        });
+        
+        function loadTimeSlots(date) {
+            // For demo purposes, we'll show sample time slots
+            // In a real app, this would be based on the doctor's schedule for the selected day
+            
+            // Generate time slots every 30 minutes from 9:00 to 17:00
+            let startHour = 9;
+            let startMinute = 0;
+            
+            const endHour = 17;
+            const endMinute = 0;
+            
+            let slots = [];
+            
+            while (startHour < endHour || (startHour === endHour && startMinute < endMinute)) {
+                const hour = startHour.toString().padStart(2, '0');
+                const minute = startMinute.toString().padStart(2, '0');
+                slots.push(`${hour}:${minute}`);
+                
+                startMinute += 30;
+                if (startMinute >= 60) {
+                    startHour += 1;
+                    startMinute = 0;
+                }
+            }
+            
+            let html = '<div class="time-slots-container">';
+            slots.forEach(time => {
+                html += `<div class="time-slot" data-time="${time}">${time}</div>`;
+            });
+            html += '</div>';
+            
+            timeSlotsContainer.innerHTML = html;
+            
+            // Add event listeners to time slots
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.addEventListener('click', function() {
+                    if (!this.classList.contains('disabled')) {
+                        // Remove selected class from all slots
+                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                        
+                        // Add selected class to clicked slot
+                        this.classList.add('selected');
+                        
+                        // Store selected time
+                        selectedTime = this.dataset.time;
+                        document.getElementById('selected_time').value = selectedTime;
+                        
+                        // Enable book button
+                        bookButton.disabled = false;
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

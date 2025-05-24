@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment - Healthcare System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .doctor-card {
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .doctor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .doctor-card.selected {
+        border: 2px solid #0d6efd;
+        background-color: #f8f9fa;
+    }
+    .time-slot {
+        display: inline-block;
+        margin: 5px;
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .time-slot:hover {
+        background-color: #e9ecef;
+    }
+    .time-slot.selected {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+    .time-slot.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2>Book an Appointment</h2>
+        <p class="text-muted">Select a doctor, date, and time to schedule your appointment</p>
+    </div>
+</div>
+
+<form method="post" id="appointmentForm">
+    {% csrf_token %}
+    <input type="hidden" name="doctor_id" id="selected_doctor_id">
+    <input type="hidden" name="appointment_date" id="selected_date">
+    <input type="hidden" name="appointment_time" id="selected_time">
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Step 1: Select Specialization</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <select class="form-select" id="specialization" name="specialization">
+                                <option value="">All Specializations</option>
+                                {% for spec_code, spec_name in specializations %}
+                                    <option value="{{ spec_code }}">{{ spec_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Step 2: Select Doctor</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="doctorsList">
+                        {% if doctors %}
+                            {% for doctor in doctors %}
+                                <div class="col-md-4 mb-4 doctor-item" data-specialization="{{ doctor.specialization }}">
+                                    <div class="card doctor-card" data-doctor-id="{{ doctor.id }}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ doctor }}</h5>
+                                            <p class="card-text"><strong>Specialization:</strong> {{ doctor.get_specialization_display }}</p>
+                                            <p class="card-text"><strong>Experience:</strong> {{ doctor.years_of_experience }} years</p>
+                                            <p class="card-text"><strong>Fee:</strong> ${{ doctor.consultation_fee }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-md-12 text-center">
+                                <p>No doctors available.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Step 3: Select Date</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <input type="text" class="form-control" id="appointment_date_picker" placeholder="Select Date" disabled>
+                            <div class="text-muted mt-2 text-center">Please select a doctor first</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Step 4: Select Time</h5>
+                </div>
+                <div class="card-body">
+                    <div id="timeSlots" class="text-center">
+                        <p>Please select a date first</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Step 5: Appointment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Reason for Visit</label>
+                        <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Additional Notes (Optional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-primary btn-lg" id="bookButton" disabled>Book Appointment</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const doctorCards = document.querySelectorAll('.doctor-card');
+        const datePicker = document.getElementById('appointment_date_picker');
+        const timeSlotsContainer = document.getElementById('timeSlots');
+        const bookButton = document.getElementById('bookButton');
+        const specializationSelect = document.getElementById('specialization');
+        const doctorItems = document.querySelectorAll('.doctor-item');
+        
+        let selectedDoctorId = null;
+        let selectedDate = null;
+        let selectedTime = null;
+        let datePickerInstance = null;
+        
+        // Filter doctors by specialization
+        specializationSelect.addEventListener('change', function() {
+            const selectedSpecialization = this.value;
+            
+            doctorItems.forEach(item => {
+                if (!selectedSpecialization || item.dataset.specialization === selectedSpecialization) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Reset selection
+            resetSelection();
+        });
+        
+        // Doctor selection
+        doctorCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selected class from all cards
+                doctorCards.forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                
+                // Store selected doctor ID
+                selectedDoctorId = this.dataset.doctorId;
+                document.getElementById('selected_doctor_id').value = selectedDoctorId;
+                
+                // Enable date picker
+                datePicker.disabled = false;
+                datePicker.nextElementSibling.textContent = 'Select a date to see available time slots';
+                
+                // Initialize or update date picker
+                initDatePicker(selectedDoctorId);
+                
+                // Reset date and time selection
+                selectedDate = null;
+                selectedTime = null;
+                document.getElementById('selected_date').value = '';
+                document.getElementById('selected_time').value = '';
+                timeSlotsContainer.innerHTML = '<p>Please select a date first</p>';
+                bookButton.disabled = true;
+            });
+        });
+        
+        function initDatePicker(doctorId) {
+            // Destroy previous instance if exists
+            if (datePickerInstance) {
+                datePickerInstance.destroy();
+            }
+            
+            // Initialize new date picker
+            datePickerInstance = flatpickr(datePicker, {
+                minDate: 'today',
+                dateFormat: 'Y-m-d',
+                disable: [
+                    function(date) {
+                        // Disable weekends or days the doctor is not available
+                        // This would be replaced with actual doctor availability data
+                        return false; // For demo, all days are available
+                    }
+                ],
+                onChange: function(selectedDates, dateStr) {
+                    selectedDate = dateStr;
+                    document.getElementById('selected_date').value = selectedDate;
+                    
+                    // Load time slots for selected date
+                    loadTimeSlots(selectedDoctorId, selectedDate);
+                }
+            });
+        }
+        
+        function loadTimeSlots(doctorId, date) {
+            // This would be replaced with an AJAX call to get available time slots
+            // For demo, we'll show some sample time slots
+            const sampleSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', 
+                                '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
+            
+            let html = '<div class="time-slots-container">';
+            sampleSlots.forEach(time => {
+                html += `<div class="time-slot" data-time="${time}">${time}</div>`;
+            });
+            html += '</div>';
+            
+            timeSlotsContainer.innerHTML = html;
+            
+            // Add event listeners to time slots
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.addEventListener('click', function() {
+                    if (!this.classList.contains('disabled')) {
+                        // Remove selected class from all slots
+                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                        
+                        // Add selected class to clicked slot
+                        this.classList.add('selected');
+                        
+                        // Store selected time
+                        selectedTime = this.dataset.time;
+                        document.getElementById('selected_time').value = selectedTime;
+                        
+                        // Enable book button
+                        bookButton.disabled = false;
+                    }
+                });
+            });
+        }
+        
+        function resetSelection() {
+            doctorCards.forEach(c => c.classList.remove('selected'));
+            selectedDoctorId = null;
+            selectedDate = null;
+            selectedTime = null;
+            document.getElementById('selected_doctor_id').value = '';
+            document.getElementById('selected_date').value = '';
+            document.getElementById('selected_time').value = '';
+            
+            datePicker.disabled = true;
+            datePicker.value = '';
+            datePicker.nextElementSibling.textContent = 'Please select a doctor first';
+            
+            timeSlotsContainer.innerHTML = '<p>Please select a date first</p>';
+            bookButton.disabled = true;
+            
+            if (datePickerInstance) {
+                datePickerInstance.destroy();
+                datePickerInstance = null;
+            }
+        }
+    });
+</script>
+{% endblock %}

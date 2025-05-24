@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Dr. {{ doctor.user.get_full_name }} - Healthcare System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'doctor_search' %}">Find a Doctor</a></li>
+                <li class="breadcrumb-item active">Doctor Profile</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Doctor Information</h5>
+            </div>
+            <div class="card-body">
+                <h4>{{ doctor }}</h4>
+                <p class="text-muted">{{ doctor.get_specialization_display }}</p>
+                <hr>
+                <p><strong>Experience:</strong> {{ doctor.years_of_experience }} years</p>
+                <p><strong>Consultation Fee:</strong> ${{ doctor.consultation_fee }}</p>
+                <p><strong>License Number:</strong> {{ doctor.license_number }}</p>
+                
+                {% if doctor.bio %}
+                <hr>
+                <h6>About</h6>
+                <p>{{ doctor.bio }}</p>
+                {% endif %}
+                
+                <div class="mt-4">
+                    <a href="{% url 'book_appointment_with_doctor' doctor.id %}" class="btn btn-primary btn-lg w-100">Book Appointment</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Weekly Schedule</h5>
+            </div>
+            <div class="card-body">
+                {% if schedules %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in schedules %}
+                                <tr>
+                                    <td><strong>{{ schedule.get_day_of_week_display }}</strong></td>
+                                    <td>{{ schedule.start_time }} - {{ schedule.end_time }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-muted small mt-2">* Schedule is subject to change. Please book an appointment to confirm availability.</p>
+                {% else %}
+                    <p class="text-center">No schedule information available.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Book an Appointment</h5>
+            </div>
+            <div class="card-body">
+                <p>To book an appointment with Dr. {{ doctor.user.get_full_name }}, please select a date and time from the available slots.</p>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'book_appointment_with_doctor' doctor.id %}" class="btn btn-primary">View Available Time Slots</a>
+                </div>
+                
+                <hr>
+                
+                <h6>What to Expect</h6>
+                <ul>
+                    <li>Consultation typically lasts 30-45 minutes</li>
+                    <li>Please arrive 15 minutes before your appointment time</li>
+                    <li>Bring your insurance information and any relevant medical records</li>
+                    <li>You will receive a confirmation email after booking</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

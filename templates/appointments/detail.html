@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointment Details - Healthcare System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                {% if user.patient %}
+                    <li class="breadcrumb-item"><a href="{% url 'patient_dashboard' %}">Dashboard</a></li>
+                {% elif user.doctor %}
+                    <li class="breadcrumb-item"><a href="{% url 'doctor_dashboard' %}">Dashboard</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active">Appointment Details</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Appointment Details</h5>
+                <span class="badge {% if appointment.status == 'CONFIRMED' %}bg-success{% elif appointment.status == 'SCHEDULED' %}bg-warning{% elif appointment.status == 'COMPLETED' %}bg-info{% elif appointment.status == 'CANCELLED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                    {{ appointment.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Appointment Information</h6>
+                        <hr>
+                        <p><strong>Date:</strong> {{ appointment.appointment_date }}</p>
+                        <p><strong>Time:</strong> {{ appointment.appointment_time }}</p>
+                        <p><strong>Created:</strong> {{ appointment.created_at }}</p>
+                        <p><strong>Last Updated:</strong> {{ appointment.updated_at }}</p>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {% if user.patient %}
+                            <h6 class="text-muted">Doctor Information</h6>
+                            <hr>
+                            <p><strong>Doctor:</strong> {{ appointment.doctor }}</p>
+                            <p><strong>Specialization:</strong> {{ appointment.doctor.get_specialization_display }}</p>
+                            <p><strong>Experience:</strong> {{ appointment.doctor.years_of_experience }} years</p>
+                            <p><strong>Fee:</strong> ${{ appointment.doctor.consultation_fee }}</p>
+                        {% elif user.doctor %}
+                            <h6 class="text-muted">Patient Information</h6>
+                            <hr>
+                            <p><strong>Patient:</strong> {{ appointment.patient }}</p>
+                            <p><strong>Gender:</strong> {{ appointment.patient.get_gender_display }}</p>
+                            <p><strong>Date of Birth:</strong> {{ appointment.patient.date_of_birth }}</p>
+                            <p><strong>Phone:</strong> {{ appointment.patient.phone_number }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h6 class="text-muted">Reason for Visit</h6>
+                        <hr>
+                        <p>{{ appointment.reason }}</p>
+                    </div>
+                </div>
+                
+                {% if appointment.notes %}
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h6 class="text-muted">Additional Notes</h6>
+                        <hr>
+                        <p>{{ appointment.notes }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if medical_record %}
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h6 class="text-muted">Medical Record</h6>
+                        <hr>
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>Diagnosis</h6>
+                                <p>{{ medical_record.diagnosis }}</p>
+                                
+                                <h6 class="mt-3">Treatment</h6>
+                                <p>{{ medical_record.treatment }}</p>
+                                
+                                {% if medical_record.medications %}
+                                <h6 class="mt-3">Medications</h6>
+                                <p>{{ medical_record.medications }}</p>
+                                {% endif %}
+                                
+                                {% if medical_record.notes %}
+                                <h6 class="mt-3">Doctor's Notes</h6>
+                                <p>{{ medical_record.notes }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-between">
+                            {% if user.patient %}
+                                <div>
+                                    <a href="{% url 'patient_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                                </div>
+                                <div>
+                                    {% if appointment.status == 'SCHEDULED' or appointment.status == 'CONFIRMED' %}
+                                        <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this appointment?')">Cancel Appointment</a>
+                                    {% endif %}
+                                </div>
+                            {% elif user.doctor %}
+                                <div>
+                                    <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                                </div>
+                                <div>
+                                    {% if appointment.status == 'SCHEDULED' %}
+                                        <a href="{% url 'confirm_appointment' appointment.id %}" class="btn btn-success">Confirm Appointment</a>
+                                    {% elif appointment.status == 'CONFIRMED' %}
+                                        <a href="{% url 'complete_appointment' appointment.id %}" class="btn btn-info">Mark as Completed</a>
+                                    {% endif %}
+                                    
+                                    {% if appointment.status == 'COMPLETED' and not medical_record %}
+                                        <a href="{% url 'create_medical_record' appointment.id %}" class="btn btn-primary">Create Medical Record</a>
+                                    {% elif medical_record %}
+                                        <a href="{% url 'edit_medical_record' medical_record.id %}" class="btn btn-primary">Edit Medical Record</a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

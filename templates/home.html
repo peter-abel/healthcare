@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Healthcare System{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-md-12 text-center">
+        <h1 class="display-4">Welcome to Healthcare System</h1>
+        <p class="lead">A simple and efficient way to manage healthcare services</p>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h3 class="card-title">For Patients</h3>
+                <p class="card-text">Book appointments with doctors, view your medical records, and manage your healthcare journey.</p>
+                {% if not user.is_authenticated %}
+                    <a href="/signup/" class="btn btn-primary">Register as Patient</a>
+                {% elif user.patient %}
+                    <a href="/patients/dashboard/" class="btn btn-primary">Go to Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h3 class="card-title">For Doctors</h3>
+                <p class="card-text">Manage your schedule, view appointments, and keep track of patient records.</p>
+                {% if not user.is_authenticated %}
+                    <a href="/signup/" class="btn btn-primary">Register as Doctor</a>
+                {% elif user.doctor %}
+                    <a href="/doctors/dashboard/" class="btn btn-primary">Go to Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h3 class="card-title">Find a Doctor</h3>
+                <p class="card-text">Search for doctors by specialization and book appointments online.</p>
+                <a href="/doctors/search/" class="btn btn-primary">Find Doctors</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Our Services</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Online appointment booking</li>
+                            <li class="list-group-item">Electronic medical records</li>
+                            <li class="list-group-item">Doctor schedule management</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Appointment reminders</li>
+                            <li class="list-group-item">Secure patient information</li>
+                            <li class="list-group-item">Easy doctor-patient communication</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
