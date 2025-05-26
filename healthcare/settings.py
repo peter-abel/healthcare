@@ -203,14 +203,12 @@ CELERY_BEAT_SCHEDULE = {
 
 # Redis Cache Configuration
 CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://localhost:6379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'PARSER_CLASS': 'redis.connection.HiredisParser',
-            'CONNECTION_POOL_KWARGS': {'max_connections': 100},
-            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+           
         }
     }
 }
