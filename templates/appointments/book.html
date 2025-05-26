@@ -238,60 +238,151 @@
                 datePickerInstance.destroy();
             }
             
-            // Initialize new date picker
-            datePickerInstance = flatpickr(datePicker, {
-                minDate: 'today',
-                dateFormat: 'Y-m-d',
-                disable: [
-                    function(date) {
-                        // Disable weekends or days the doctor is not available
-                        // This would be replaced with actual doctor availability data
-                        return false; // For demo, all days are available
+            // Show loading message
+            datePicker.nextElementSibling.textContent = 'Loading doctor schedule...';
+            
+            // Fetch doctor schedules to determine available days
+            fetch(`/api/v1/doctors/${doctorId}/schedules/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch doctor schedules');
                     }
-                ],
-                onChange: function(selectedDates, dateStr) {
-                    selectedDate = dateStr;
-                    document.getElementById('selected_date').value = selectedDate;
+                    return response.json();
+                })
+                .then(data => {
+                    // Get available days of week from schedules
+                    const availableDays = data.map(schedule => schedule.day_of_week);
                     
-                    // Load time slots for selected date
-                    loadTimeSlots(selectedDoctorId, selectedDate);
-                }
-            });
+                    // Initialize date picker with available days
+                    datePickerInstance = flatpickr(datePicker, {
+                        minDate: 'today',
+                        dateFormat: 'Y-m-d',
+                        disable: [
+                            function(date) {
+                                // Disable days the doctor is not available
+                                const dayOfWeek = date.getDay(); // 0 is Sunday, 6 is Saturday
+                                
+                                // Convert to match our day_of_week (0 is Monday, 6 is Sunday)
+                                const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                                
+                                // Disable if day is not in available days
+                                return !availableDays.includes(adjustedDay);
+                            }
+                        ],
+                        onChange: function(selectedDates, dateStr) {
+                            selectedDate = dateStr;
+                            document.getElementById('selected_date').value = selectedDate;
+                            
+                            // Load time slots for selected date
+                            loadTimeSlots(selectedDoctorId, selectedDate);
+                        }
+                    });
+                    
+                    datePicker.nextElementSibling.textContent = 'Select a date to see available time slots';
+                })
+                .catch(error => {
+                    console.error('Error fetching doctor schedules:', error);
+                    
+                    // Fallback to allowing all days
+                    datePickerInstance = flatpickr(datePicker, {
+                        minDate: 'today',
+                        dateFormat: 'Y-m-d',
+                        onChange: function(selectedDates, dateStr) {
+                            selectedDate = dateStr;
+                            document.getElementById('selected_date').value = selectedDate;
+                            
+                            // Load time slots for selected date
+                            loadTimeSlots(selectedDoctorId, selectedDate);
+                        }
+                    });
+                    
+                    datePicker.nextElementSibling.textContent = 'Select a date (schedule data unavailable)';
+                });
         }
         
         function loadTimeSlots(doctorId, date) {
-            // This would be replaced with an AJAX call to get available time slots
-            // For demo, we'll show some sample time slots
-            const sampleSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', 
-                                '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
+            // Show loading indicator
+            timeSlotsContainer.innerHTML = '<p>Loading available time slots...</p>';
             
-            let html = '<div class="time-slots-container">';
-            sampleSlots.forEach(time => {
-                html += `<div class="time-slot" data-time="${time}">${time}</div>`;
-            });
-            html += '</div>';
-            
-            timeSlotsContainer.innerHTML = html;
-            
-            // Add event listeners to time slots
-            document.querySelectorAll('.time-slot').forEach(slot => {
-                slot.addEventListener('click', function() {
-                    if (!this.classList.contains('disabled')) {
-                        // Remove selected class from all slots
-                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-                        
-                        // Add selected class to clicked slot
-                        this.classList.add('selected');
-                        
-                        // Store selected time
-                        selectedTime = this.dataset.time;
-                        document.getElementById('selected_time').value = selectedTime;
-                        
-                        // Enable book button
-                        bookButton.disabled = false;
+            // Make API call to get available slots
+            fetch(`/api/v1/doctors/${doctorId}/available-slots/?date=${date}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch available slots');
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    const availableSlots = data.available_slots;
+                    
+                    if (availableSlots && availableSlots.length > 0) {
+                        let html = '<div class="time-slots-container">';
+                        availableSlots.forEach(time => {
+                            html += `<div class="time-slot" data-time="${time}">${time}</div>`;
+                        });
+                        html += '</div>';
+                        
+                        timeSlotsContainer.innerHTML = html;
+                        
+                        // Add event listeners to time slots
+                        document.querySelectorAll('.time-slot').forEach(slot => {
+                            slot.addEventListener('click', function() {
+                                if (!this.classList.contains('disabled')) {
+                                    // Remove selected class from all slots
+                                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                                    
+                                    // Add selected class to clicked slot
+                                    this.classList.add('selected');
+                                    
+                                    // Store selected time
+                                    selectedTime = this.dataset.time;
+                                    document.getElementById('selected_time').value = selectedTime;
+                                    
+                                    // Enable book button
+                                    bookButton.disabled = false;
+                                }
+                            });
+                        });
+                    } else {
+                        timeSlotsContainer.innerHTML = '<p>No available time slots for this date. Please select another date.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching available slots:', error);
+                    
+                    // Fallback to sample slots in case of error
+                    const sampleSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', 
+                                        '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'];
+                    
+                    let html = '<div class="time-slots-container">';
+                    html += '<div class="alert alert-warning">Could not fetch real-time availability. Showing sample slots.</div>';
+                    sampleSlots.forEach(time => {
+                        html += `<div class="time-slot" data-time="${time}">${time}</div>`;
+                    });
+                    html += '</div>';
+                    
+                    timeSlotsContainer.innerHTML = html;
+                    
+                    // Add event listeners to time slots
+                    document.querySelectorAll('.time-slot').forEach(slot => {
+                        slot.addEventListener('click', function() {
+                            if (!this.classList.contains('disabled')) {
+                                // Remove selected class from all slots
+                                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                                
+                                // Add selected class to clicked slot
+                                this.classList.add('selected');
+                                
+                                // Store selected time
+                                selectedTime = this.dataset.time;
+                                document.getElementById('selected_time').value = selectedTime;
+                                
+                                // Enable book button
+                                bookButton.disabled = false;
+                            }
+                        });
+                    });
                 });
-            });
         }
         
         function resetSelection() {

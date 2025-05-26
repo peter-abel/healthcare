@@ -1,56 +1,76 @@
-from django.db import models
-from django.core.exceptions import ValidationError
-from django.utils import timezone
-from apps.patients.models import Patient
-from apps.doctors.models import Doctor
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from .models import Appointment
+from patients.serializers import PatientSerializer
+from doctors.serializers import DoctorSerializer
 
-class Appointment(models.Model):
-    STATUS_CHOICES = [
-        ('SCHEDULED', 'Scheduled'),
-        ('CONFIRMED', 'Confirmed'),
-        ('COMPLETED', 'Completed'),
-        ('CANCELLED', 'Cancelled'),
-        ('NO_SHOW', 'No Show'),
-    ]
-    
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
-    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='appointments')
-    appointment_date = models.DateField()
-    appointment_time = models.TimeField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='SCHEDULED')
-    reason = models.TextField()
-    notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class AppointmentSerializer(serializers.ModelSerializer):
+    patient = PatientSerializer(read_only=True)
+    doctor = DoctorSerializer(read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
     
     class Meta:
-        unique_together = ['doctor', 'appointment_date', 'appointment_time']
-        ordering = ['appointment_date', 'appointment_time']
+        model = Appointment
+        fields = '__all__'
+        read_only_fields = ['created_at', 'updated_at']
+
+class AppointmentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['patient', 'doctor', 'appointment_date', 'appointment_time', 'reason', 'notes']
     
-    def clean(self):
+    def validate(self, data):
+        """
+        Check that the appointment is valid.
+        """
         # Check if appointment is in the past
+        from django.utils import timezone
         appointment_datetime = timezone.make_aware(
-            timezone.datetime.combine(self.appointment_date, self.appointment_time)
+            timezone.datetime.combine(data['appointment_date'], data['appointment_time'])
         )
         if appointment_datetime <= timezone.now():
-            raise ValidationError("Cannot schedule appointment in the past")
+            raise serializers.ValidationError("Cannot schedule appointment in the past")
         
         # Check doctor availability
-        day_of_week = self.appointment_date.weekday()
-        schedule = self.doctor.schedules.filter(
+        day_of_week = data['appointment_date'].weekday()
+        schedule = data['doctor'].schedules.filter(
             day_of_week=day_of_week,
             is_available=True
         ).first()
         
         if not schedule:
-            raise ValidationError("Doctor is not available on this day")
+            raise serializers.ValidationError("Doctor is not available on this day")
         
-        if not (schedule.start_time <= self.appointment_time <= schedule.end_time):
-            raise ValidationError("Appointment time is outside doctor's schedule")
+        if not (schedule.start_time <= data['appointment_time'] <= schedule.end_time):
+            raise serializers.ValidationError("Appointment time is outside doctor's schedule")
+        
+        # Check for conflicting appointments
+        existing_appointment = Appointment.objects.filter(
+            doctor=data['doctor'],
+            appointment_date=data['appointment_date'],
+            appointment_time=data['appointment_time']
+        ).exists()
+        
+        if existing_appointment:
+            raise serializers.ValidationError("This time slot is already booked")
+        
+        return data
+
+class AppointmentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['status', 'notes']
+        read_only_fields = ['patient', 'doctor', 'appointment_date', 'appointment_time', 'reason', 'created_at', 'updated_at']
+
+class AppointmentBulkCreateSerializer(serializers.Serializer):
+    appointments = AppointmentCreateSerializer(many=True)
     
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
-    
-    def __str__(self):
-        return f"{self.patient} with {self.doctor} on {self.appointment_date} at {self.appointment_time}"
+    def create(self, validated_data):
+        appointments_data = validated_data.pop('appointments')
+        appointments = []
+        
+        for appointment_data in appointments_data:
+            appointment = Appointment.objects.create(**appointment_data)
+            appointments.append(appointment)
+        
+        return {'appointments': appointments}

@@ -5,3 +5,310 @@ C:\Users\user\Desktop\healthcare\appointments\models.py changed, reloading.
 Watching for file changes with StatReloader
 C:\Users\user\Desktop\healthcare\authenticator\views.py changed, reloading.
 Watching for file changes with StatReloader
+Not Found: /fund/2/fact-sheet/
+"GET /fund/2/fact-sheet/ HTTP/1.1" 404 3487
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3466
+"GET / HTTP/1.1" 200 4985
+Internal Server Error: /doctors/search/
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\sqlite3\base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: doctors_doctor
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\doctors\views.py", line 229, in doctor_search
+    page_obj = paginator.get_page(page_number)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\paginator.py", line 85, in get_page
+    return self.page(number)
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\paginator.py", line 89, in page
+    number = self.validate_number(number)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\paginator.py", line 70, in validate_number
+    if number > self.num_pages:
+                ^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\paginator.py", line 116, in num_pages
+    if self.count == 0 and not self.allow_empty_first_page:
+       ^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\paginator.py", line 110, in count
+    return c()
+           ^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\query.py", line 604, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\sql\query.py", line 644, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\sql\query.py", line 626, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\sql\compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\sqlite3\base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such table: doctors_doctor
+"GET /doctors/search/ HTTP/1.1" 500 158460
+Not Found: /signup/
+"GET /signup/ HTTP/1.1" 404 3454
+Not Found: /signup/
+"GET /signup/ HTTP/1.1" 404 3454
+"GET /login/ HTTP/1.1" 200 5290
+Not Found: /signup/
+"GET /signup/ HTTP/1.1" 404 3454
+Not Found: /signup/
+"GET /signup/ HTTP/1.1" 404 3454
+"GET / HTTP/1.1" 200 4985
+Not Found: /signup/
+"GET /signup/ HTTP/1.1" 404 3454
+"GET /login/ HTTP/1.1" 200 5290
+Not Found: /signup/
+"GET /signup/ HTTP/1.1" 404 3454
+C:\Users\user\Desktop\healthcare\healthcare\urls.py changed, reloading.
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 4985
+"GET / HTTP/1.1" 200 4985
+Not Found: /login/
+"GET /login/ HTTP/1.1" 404 3123
+C:\Users\user\Desktop\healthcare\healthcare\urls.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /login/ HTTP/1.1" 200 5270
+Internal Server Error: /signup/
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\authenticator\views.py", line 147, in signup
+    return render(request, 'signup.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'term' not found. 'term' is not a valid view function or pattern name.
+"GET /signup/ HTTP/1.1" 500 117548
+"GET /signup/ HTTP/1.1" 200 6207
+"GET /signup/ HTTP/1.1" 200 6207
+C:\Users\user\Desktop\healthcare\healthcare\settings.py changed, reloading.
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 4985
+"GET /signup/ HTTP/1.1" 200 6207
+Internal Server Error: /signup/
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\sqlite3\base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: auth_user
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\authenticator\views.py", line 115, in signup
+    if User.objects.filter(username=username).exists():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\query.py", line 1294, in exists
+    return self.query.has_results(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\sql\query.py", line 674, in has_results
+    return compiler.has_results()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\sql\compiler.py", line 1591, in has_results
+    return bool(self.execute_sql(SINGLE))
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\sql\compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\backends\sqlite3\base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such table: auth_user
+"POST /signup/ HTTP/1.1" 500 128395
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 4985
+"GET / HTTP/1.1" 200 4985
+"GET /signup/ HTTP/1.1" 200 6207
+"POST /signup/ HTTP/1.1" 302 0
+"GET /signup/ HTTP/1.1" 200 6355
+C:\Users\user\Desktop\healthcare\authenticator\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\user\Desktop\healthcare\authenticator\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\user\Desktop\healthcare\authenticator\urls.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /signup/ HTTP/1.1" 200 6207
+"POST /signup/ HTTP/1.1" 302 0
+"GET /signup/ HTTP/1.1" 200 6355
+"GET /signup/ HTTP/1.1" 200 6207
+"GET /signup/ HTTP/1.1" 200 6207
+"POST /signup/ HTTP/1.1" 302 0
+"GET /verify_otp/ HTTP/1.1" 200 7918
+"POST /verify_otp/ HTTP/1.1" 302 0
+Internal Server Error: /login/
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\authenticator\views.py", line 66, in user_login
+    return render(request, "login.html")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\base.py", line 1016, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\base.py", line 977, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\urls\base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'student_login' not found. 'student_login' is not a valid view function or pattern name.
+"GET /login/ HTTP/1.1" 500 117411
+"GET /login/ HTTP/1.1" 200 5138
+"POST /login/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 5121
+"GET /doctors/search/ HTTP/1.1" 200 5793
+"GET / HTTP/1.1" 200 5121
+"GET / HTTP/1.1" 200 5121
+C:\Users\user\Desktop\healthcare\healthcare\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\user\Desktop\healthcare\healthcare\settings.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\user\Desktop\healthcare\healthcare\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\user\Desktop\healthcare\appointments\api.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 5121
+"GET / HTTP/1.1" 200 5121
+"GET /doctors/search/ HTTP/1.1" 200 5793
+"GET /doctors/search/?specialization=&experience=&max_fee= HTTP/1.1" 200 5793
+"GET / HTTP/1.1" 200 5121
+"GET / HTTP/1.1" 200 5121
+"GET /logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 4985
+"GET /login/ HTTP/1.1" 200 5138
+"POST /login/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 5121
+"GET /doctors/search/ HTTP/1.1" 200 5793
+"GET /doctors/search/ HTTP/1.1" 200 5793
+"GET / HTTP/1.1" 200 5121
+Not Found: /dashboard
+"GET /dashboard HTTP/1.1" 404 5198
+C:\Users\user\Desktop\healthcare\healthcare\urls.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard HTTP/1.1" 301 0
+"GET /dashboard/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 200 5491

@@ -20,17 +20,17 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
+    # Admin site
     path('admin/', admin.site.urls),
+    
+    # Web UI routes
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
+    path('', include('patients.urls')),
+    path('', include('doctors.urls')),
+    path('', include('appointments.urls')),
+    path('', include('authenticator.urls')),
     
-    # Authentication URLs
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
-    
-    # Include app-specific URLs
-    path('patients/', include('patients.urls')),
-    path('doctors/', include('doctors.urls')),
-    path('appointments/', include('appointments.urls')),
-    path('auth/', include('authenticator.urls')),
+    # API routes
+    path('api/v1/', include('healthcare.api_urls')),
 ]

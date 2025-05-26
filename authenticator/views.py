@@ -15,7 +15,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
 from django.core.cache import cache
 
-#from teacher.models import TeacherProfile, TestRegistration
 
 
 
@@ -25,13 +24,7 @@ def sos(request,exception):
 
     return render(request, "404.html")  
 
-def student_login(request):
-    if request.method == 'POST':
-       messages.error(request, 'No account found with this email address')
-       return redirect('student_login')
 
-
-    return render(request, "student_login.html")  
 
 
 def user_login(request):
@@ -67,29 +60,8 @@ def user_login(request):
 
         login(request, user)
 
-         # Check if the user has a TeacherProfile
-        if not TeacherProfile.objects.filter(owner=user).exists():
-            return redirect('create_profile')
-
-        # Check if the user has registered for the test
-        test_registration, created = TestRegistration.objects.get_or_create(user=user)
-        if not test_registration.test_taken:
-            return redirect('test')
-
-        # Handle pending results
-        if test_registration.test_taken and not test_registration.results_confirmed:
-            return redirect('results_pending')  # Redirect to a "results pending" page
-
-
-        # Redirect to test_completed only once
-        if test_registration.test_taken and test_registration.results_confirmed:
-            if not test_registration.redirected_to_test_completed:
-                test_registration.redirected_to_test_completed = True
-                test_registration.save()
-                return redirect('test_completed')
-
         # Redirect to home if the user has already been to 'test_completed'
-        return redirect('teacher_home')
+        return redirect('home')
 
     return render(request, "login.html")
 
