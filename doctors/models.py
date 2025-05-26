@@ -21,7 +21,7 @@ class Doctor(models.Model):
     license_number = models.CharField(max_length=50, unique=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$')
     phone_number = models.CharField(validators=[phone_regex], max_length=17)
-    years_of_experience = models.PositiveIntegerField()
+    years_of_experience = models.PositiveIntegerField(default=1)
     consultation_fee = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     bio = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

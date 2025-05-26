@@ -10,7 +10,7 @@ class Patient(models.Model):
     ]
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(null=True, blank=True)  
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$')
     phone_number = models.CharField(validators=[phone_regex], max_length=17)

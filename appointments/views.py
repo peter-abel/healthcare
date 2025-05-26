@@ -104,15 +104,36 @@ def book_appointment_with_doctor(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
     
     if request.method == 'POST':
-        appointment_date = request.POST.get('appointment_date')
-        appointment_time = request.POST.get('appointment_time')
+        doctor_id = request.POST.get('doctor_id')
+        appointment_date_str = request.POST.get('appointment_date')
+        appointment_time_str = request.POST.get('appointment_time')
         reason = request.POST.get('reason')
         notes = request.POST.get('notes', '')
         
         # Validate inputs
-        if not all([appointment_date, appointment_time, reason]):
+        if not all([doctor_id, appointment_date_str, appointment_time_str, reason]):
             messages.error(request, "Please fill in all required fields.")
-            return redirect('book_appointment_with_doctor', doctor_id=doctor_id)
+            return redirect('book_appointment')
+        
+        doctor = get_object_or_404(Doctor, id=doctor_id)
+        
+        # Convert string inputs to proper date and time objects
+        try:
+            # Parse date string (expecting format: YYYY-MM-DD)
+            appointment_date = datetime.strptime(appointment_date_str, '%Y-%m-%d').date()
+            
+            # Parse time string (expecting format: HH:MM)
+            appointment_time = datetime.strptime(appointment_time_str, '%H:%M').time()
+            
+            # Validate that the appointment is not in the past
+            appointment_datetime = datetime.combine(appointment_date, appointment_time)
+            if appointment_datetime < datetime.now():
+                messages.error(request, "Cannot book appointments in the past.")
+                return redirect('book_appointment')
+                
+        except ValueError as e:
+            messages.error(request, "Invalid date or time format. Please check your inputs.")
+            return redirect('book_appointment')
         
         # Create appointment
         try:

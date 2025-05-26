@@ -206,24 +206,28 @@ def verify_otp(request):
             
             # Clear session data after successful registration
             request.session.pop('otp', None)
-            #request.session.pop('user_data', None)
             
             # Get the stored role
             stored_role = user_data.get('role')
-            print(f"Debug: stored_role = {stored_role}")  # Add this for debugging
+            print(f"Debug: stored_role = {stored_role}")
             
             if stored_role in ['patient', 'doctor']:
                 if stored_role == 'patient':
-                    Patient.objects.create(user=user,date_of_birth=date(1900, 1, 1))
+                    Patient.objects.create(
+                        user=user,
+                        date_of_birth=date(1900, 1, 1)  # Provide required field
+                    )
                     messages.success(request, 'Registration successful. Please login to complete your patient profile.')
                     request.session.pop('user_data', None)
-
                     return redirect('patient_profile')
                 else:
-                    Doctor.objects.create(user=user,years_of_experience=1)
+                    # FIX: Provide required years_of_experience field
+                    Doctor.objects.create(
+                        user=user,
+                        years_of_experience=1  # Provide default value
+                    )
                     messages.success(request, 'Registration successful. Please login to complete your doctor profile.')
                     request.session.pop('user_data', None)
-
                     return redirect('doctor_profile')
             else:
                 messages.success(request, 'Registration successful. Please select your role.')
@@ -233,40 +237,10 @@ def verify_otp(request):
      
     return render(request, 'verify_otp.html')
 
+
 def user_logout(request):
     logout(request)
     return redirect('home') 
-
-
-@login_required
-def role_selection(request):
-    """
-    View for selecting role (patient or doctor) after signup.
-    """
-    # Check if user already has a role
-    profile_type = check_profile_exists(request.user)
-    if profile_type:
-        messages.info(request, f"You already have a {profile_type} profile.")
-        if profile_type == 'patient':
-            return redirect('patient_dashboard')
-        else:
-            return redirect('doctor_dashboard')
-
-    if request.method == 'POST':
-        role = request.POST.get('role')
-        if role not in ['patient', 'doctor']:
-            messages.error(request, "Invalid role selected.")
-            return redirect('role_selection')
-
-        # Create the appropriate profile
-        if role == 'patient':
-            Patient.objects.create(user=request.user)
-            return redirect('patient_profile')
-        else:
-            Doctor.objects.create(user=request.user)
-            return redirect('doctor_profile')
-
-    return render(request, 'choose_role.html')
 
 
 
