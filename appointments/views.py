@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -26,25 +27,43 @@ def book_appointment(request):
     
     if request.method == 'POST':
         doctor_id = request.POST.get('doctor_id')
-        appointment_date = request.POST.get('appointment_date')
-        appointment_time = request.POST.get('appointment_time')
+        appointment_date_str = request.POST.get('appointment_date')
+        appointment_time_str = request.POST.get('appointment_time')
         reason = request.POST.get('reason')
         notes = request.POST.get('notes', '')
         
         # Validate inputs
-        if not all([doctor_id, appointment_date, appointment_time, reason]):
+        if not all([doctor_id, appointment_date_str, appointment_time_str, reason]):
             messages.error(request, "Please fill in all required fields.")
             return redirect('book_appointment')
         
         doctor = get_object_or_404(Doctor, id=doctor_id)
+        
+        # Convert string inputs to proper date and time objects
+        try:
+            # Parse date string (expecting format: YYYY-MM-DD)
+            appointment_date = datetime.strptime(appointment_date_str, '%Y-%m-%d').date()
+            
+            # Parse time string (expecting format: HH:MM)
+            appointment_time = datetime.strptime(appointment_time_str, '%H:%M').time()
+            
+            # Validate that the appointment is not in the past
+            appointment_datetime = datetime.combine(appointment_date, appointment_time)
+            if appointment_datetime < datetime.now():
+                messages.error(request, "Cannot book appointments in the past.")
+                return redirect('book_appointment')
+                
+        except ValueError as e:
+            messages.error(request, "Invalid date or time format. Please check your inputs.")
+            return redirect('book_appointment')
         
         # Create appointment
         try:
             appointment = Appointment(
                 patient=patient,
                 doctor=doctor,
-                appointment_date=appointment_date,
-                appointment_time=appointment_time,
+                appointment_date=appointment_date,  # Now a proper date object
+                appointment_time=appointment_time,  # Now a proper time object
                 reason=reason,
                 notes=notes,
                 status='SCHEDULED'
@@ -69,6 +88,7 @@ def book_appointment(request):
     }
     
     return render(request, 'appointments/book.html', context)
+
 
 @login_required
 def book_appointment_with_doctor(request, doctor_id):
@@ -164,6 +184,7 @@ def appointment_detail(request, appointment_id):
     """
     View for viewing a specific appointment's details.
     """
+  
     # Check if user is a patient or doctor
     if hasattr(request.user, 'patient'):
         # User is a patient

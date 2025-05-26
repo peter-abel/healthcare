@@ -55,8 +55,9 @@ def profile(request):
     try:
         doctor = request.user.doctor
     except Doctor.DoesNotExist:
+        # This shouldn't happen normally as the role selection process creates the profile
         messages.error(request, "You don't have a doctor profile.")
-        return redirect('home')
+        return redirect('role_selection')
     
     if request.method == 'POST':
         # Update user information
@@ -88,6 +89,8 @@ def profile(request):
         doctor.save()
         
         messages.success(request, "Profile updated successfully.")
+        if not doctor.license_number:  # Check if this is the first time filling out the profile
+            messages.info(request, "Welcome! Your profile has been created successfully.")
         return redirect('doctor_dashboard')
     
     context = {
@@ -96,7 +99,6 @@ def profile(request):
     }
     
     return render(request, 'doctors/profile.html', context)
-
 @login_required
 def manage_schedule(request):
     """
@@ -138,10 +140,11 @@ def manage_schedule(request):
         return redirect('doctor_dashboard')
     
     # Get current schedules
-    schedules = {}
+    schedules_dict = {}
     for schedule in DoctorSchedule.objects.filter(doctor=doctor):
-        schedules[schedule.day_of_week] = schedule
+        schedules_dict[schedule.day_of_week] = schedule
     
+    # Create a list of days with their schedule data for easy template access
     days_of_week = [
         (0, 'Monday'),
         (1, 'Tuesday'),
@@ -152,13 +155,29 @@ def manage_schedule(request):
         (6, 'Sunday'),
     ]
     
+    # Process days with schedule information
+    days_with_schedules = []
+    for day_num, day_name in days_of_week:
+        schedule = schedules_dict.get(day_num)
+        days_with_schedules.append({
+            'day_num': day_num,
+            'day_name': day_name,
+            'schedule': schedule,
+            'is_available': schedule.is_available if schedule else False,
+            'start_time': schedule.start_time if schedule else '09:00',
+            'end_time': schedule.end_time if schedule else '17:00',
+        })
+    
     context = {
         'doctor': doctor,
-        'schedules': schedules,
+        'schedules': schedules_dict,  # Keep original for backward compatibility if needed
         'days_of_week': days_of_week,
+        'days_with_schedules': days_with_schedules,  # New template-friendly data
     }
     
     return render(request, 'doctors/manage_schedule.html', context)
+
+
 
 @login_required
 def appointments_list(request):

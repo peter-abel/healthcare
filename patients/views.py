@@ -47,8 +47,9 @@ def profile(request):
     try:
         patient = request.user.patient
     except Patient.DoesNotExist:
+        # This shouldn't happen normally as the role selection process creates the profile
         messages.error(request, "You don't have a patient profile.")
-        return redirect('home')
+        return redirect('role_selection')
     
     if request.method == 'POST':
         # Update user information
@@ -82,6 +83,8 @@ def profile(request):
         patient.save()
         
         messages.success(request, "Profile updated successfully.")
+        if not patient.date_of_birth:  # Check if this is the first time filling out the profile
+            messages.info(request, "Welcome! Your profile has been created successfully.")
         return redirect('patient_dashboard')
     
     context = {

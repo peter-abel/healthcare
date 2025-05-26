@@ -21,6 +21,37 @@
             min-height: calc(100vh - 180px);
             padding: 20px 0;
         }
+         /* Custom CSS for Django messages */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -40,17 +71,17 @@
                     {% if user.is_authenticated %}
                         {% if user.patient %}
                             <li class="nav-item">
-                                <a class="nav-link" href="/patients/dashboard/">Dashboard</a>
+                                <a class="nav-link" href="{% url 'patient_dashboard' %}">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/appointments/book/">Book Appointment</a>
+                                <a class="nav-link" href="{% url 'book_appointment' %}">Book Appointment</a>
                             </li>
                         {% elif user.doctor %}
                             <li class="nav-item">
-                                <a class="nav-link" href="/doctors/dashboard/">Dashboard</a>
+                                <a class="nav-link" href="{% url 'doctor_dashboard' %}">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/doctors/schedule/">Manage Schedule</a>
+                                <a class="nav-link" href="/schedule/">Manage Schedule</a>
                             </li>
                         {% endif %}
                     {% endif %}
@@ -63,21 +94,20 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 {% if user.patient %}
-                                    <li><a class="dropdown-item" href="/patients/profile/">My Profile</a></li>
+                                    <li><a class="dropdown-item" href="/profile/">My Profile</a></li>
                                 {% elif user.doctor %}
-                                    <li><a class="dropdown-item" href="/doctors/profile/">My Profile</a></li>
+                                    <li><a class="dropdown-item" href="/doctor-profile/">My Profile</a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/logout/">Logout</a></li>
                             </ul>
                         </li>
-                    {% else %}
+                        {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="/login/">Login</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/signup/">Register</a>
-                        </li>
+                        
+                    
                     {% endif %}
                 </ul>
             </div>
@@ -86,6 +116,7 @@
 
     <!-- Main Content -->
     <div class="container content">
+        
         {% if messages %}
             <div class="messages mt-3">
                 {% for message in messages %}
@@ -96,9 +127,11 @@
                 {% endfor %}
             </div>
         {% endif %}
+        
 
         {% block content %}{% endblock %}
     </div>
+
 
     <!-- Footer -->
     <footer class="footer">

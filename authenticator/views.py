@@ -1,3 +1,6 @@
+from datetime import date
+from urllib.parse import urlencode
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 import random
@@ -14,6 +17,9 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
 from django.core.cache import cache
+from django.urls import reverse
+from doctors.models import Doctor
+from patients.models import Patient
 
 
 
@@ -26,6 +32,20 @@ def sos(request,exception):
 
 
 
+
+def check_profile_exists(user):
+    """
+    Check if the user has either a patient or doctor profile.
+    Returns the profile type ('patient', 'doctor') or None.
+    """
+    try:
+        if hasattr(user, 'patient'):
+            return 'patient'
+        elif hasattr(user, 'doctor'):
+            return 'doctor'
+        return None
+    except:
+        return None
 
 def user_login(request):
     if request.method == 'POST':
@@ -60,8 +80,17 @@ def user_login(request):
 
         login(request, user)
 
-        # Redirect to home if the user has already been to 'test_completed'
-        return redirect('home')
+        # Check if user has a profile
+        profile_type = check_profile_exists(user)
+        if profile_type:
+            # Redirect to appropriate dashboard
+            if profile_type == 'patient':
+                return redirect('patient_dashboard')
+            else:
+                return redirect('doctor_dashboard')
+        else:
+            # Redirect to role selection if no profile exists
+            return redirect('role_selection')
 
     return render(request, "login.html")
 
@@ -69,37 +98,59 @@ def user_login(request):
 
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
-
 def signup(request):
+    # Get role from query parameter
+    role = request.GET.get('role')
+    print(f"Debug: Role from URL parameter: {role}")  # Debug line
+    
+    if role not in ['patient', 'doctor']:
+        role = None
+        print(f"Debug: Role set to None because it's not valid")  # Debug line
+    
     if request.method == 'POST':
+        # Also check if role was passed via POST (from hidden form field)
+        post_role = request.POST.get('role')
+        if post_role and post_role in ['patient', 'doctor']:
+            role = post_role
+            print(f"Debug: Role from POST data: {role}")  # Debug line
+        elif role is None:
+            # If no role from URL and no role from POST, this is the issue
+            print(f"Debug: No role found in either URL or POST data!")
+            
         username = request.POST['name']
         email = request.POST['email']
         password = request.POST['password']
-
+        
+        print(f"Debug: Final role being stored in session: {role}")  # Debug line
+        
         # Validate email format
         try:
             validate_email(email)
         except ValidationError:
             messages.error(request, 'Invalid email format')
             return redirect('signup')
-
+        
         # Check if username or email already exists
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Username already exists')
             return redirect('signup')
-
+        
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already exists')
             return redirect('signup')
-
+        
         otp = generate_otp()
         request.session['otp'] = otp
         request.session['user_data'] = {
             'username': username,
             'email': email,
-            'password': password
+            'password': password,
+            'role': role  # Store the role in session
         }
-
+        
+        # Debug: Print what's being stored in session
+        print(f"Debug: Session user_data: {request.session['user_data']}")
+        
         # Send OTP via email
         try:
             send_mail(
@@ -113,10 +164,15 @@ def signup(request):
             print(f"Error sending email: {str(e)}")
             messages.error(request, 'Error sending OTP email. Please try again.')
             return redirect('signup')
-
+        
         return redirect('verify_otp')
+    
+    # For GET requests, pass the role to the template
+    context = {'selected_role': role} if role else {}
+    return render(request, 'signup.html', context)
 
-    return render(request, 'signup.html')
+
+    
 
 
 def verify_otp(request):
@@ -124,17 +180,17 @@ def verify_otp(request):
         user_otp = request.POST['otp']
         stored_otp = request.session.get('otp')
         user_data = request.session.get('user_data')
-
+        
         if user_otp == stored_otp:
-            # Check if the user already exists (due to a previous failed attempt)
+            # Check if the user already exists
             if User.objects.filter(username=user_data['username']).exists():
                 messages.error(request, 'This username has already been registered.')
                 return redirect('signup')
-
+            
             if User.objects.filter(email=user_data['email']).exists():
                 messages.error(request, 'This email has already been registered.')
                 return redirect('signup')
-
+            
             # Try creating the user
             try:
                 user = User.objects.create_user(
@@ -142,29 +198,76 @@ def verify_otp(request):
                     email=user_data['email'],
                     password=user_data['password']
                 )
-                user.password = make_password(user_data['password'])
                 user.is_active = True
                 user.save()
             except IntegrityError:
                 messages.error(request, 'An error occurred during registration. Please try again.')
                 return redirect('signup')
-
+            
             # Clear session data after successful registration
-
             request.session.pop('otp', None)
-            request.session.pop('user_data', None)
+            #request.session.pop('user_data', None)
+            
+            # Get the stored role
+            stored_role = user_data.get('role')
+            print(f"Debug: stored_role = {stored_role}")  # Add this for debugging
+            
+            if stored_role in ['patient', 'doctor']:
+                if stored_role == 'patient':
+                    Patient.objects.create(user=user,date_of_birth=date(1900, 1, 1))
+                    messages.success(request, 'Registration successful. Please login to complete your patient profile.')
+                    request.session.pop('user_data', None)
 
-            messages.success(request, 'Registration successful. You can now log in.')
-            return redirect('user_login')
+                    return redirect('patient_profile')
+                else:
+                    Doctor.objects.create(user=user,years_of_experience=1)
+                    messages.success(request, 'Registration successful. Please login to complete your doctor profile.')
+                    request.session.pop('user_data', None)
+
+                    return redirect('doctor_profile')
+            else:
+                messages.success(request, 'Registration successful. Please select your role.')
+                return redirect('role_selection')
         else:
             messages.error(request, 'Invalid OTP. Please try again.')
-
+     
     return render(request, 'verify_otp.html')
-
 
 def user_logout(request):
     logout(request)
     return redirect('home') 
+
+
+@login_required
+def role_selection(request):
+    """
+    View for selecting role (patient or doctor) after signup.
+    """
+    # Check if user already has a role
+    profile_type = check_profile_exists(request.user)
+    if profile_type:
+        messages.info(request, f"You already have a {profile_type} profile.")
+        if profile_type == 'patient':
+            return redirect('patient_dashboard')
+        else:
+            return redirect('doctor_dashboard')
+
+    if request.method == 'POST':
+        role = request.POST.get('role')
+        if role not in ['patient', 'doctor']:
+            messages.error(request, "Invalid role selected.")
+            return redirect('role_selection')
+
+        # Create the appropriate profile
+        if role == 'patient':
+            Patient.objects.create(user=request.user)
+            return redirect('patient_profile')
+        else:
+            Doctor.objects.create(user=request.user)
+            return redirect('doctor_profile')
+
+    return render(request, 'choose_role.html')
+
 
 
 #Password Reset views.

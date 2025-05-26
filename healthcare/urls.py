@@ -28,7 +28,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('', include('patients.urls')),
     path('', include('doctors.urls')),
-    path('', include('appointments.urls')),
+    path('appointments/', include('appointments.urls')),
     path('', include('authenticator.urls')),
     
     # API routes

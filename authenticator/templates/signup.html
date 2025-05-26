@@ -137,8 +137,13 @@
 <body>
     <div class="signup-container">
         <h2>Create Your Account</h2>
-        
-        
+        {% if request.GET.role == 'patient' %}
+            <p class="text-center text-muted mb-4">Sign up as a Patient</p>
+        {% elif request.GET.role == 'doctor' %}
+            <p class="text-center text-muted mb-4">Sign up as a Doctor</p>
+        {% else %}
+            <p class="text-center text-muted mb-4">Create your account to get started</p>
+        {% endif %}
 
         <div class="or-divider">
             <span>OR</span>
@@ -168,6 +173,9 @@
                     <a href="{% url 'home' %}" target="_blank">Privacy Policy</a>
                 </label>
             </div>
+            {% if selected_role %}
+                 <input type="hidden" name="role" value="{{ selected_role }}">
+            {% endif %}
             
             
             <button type="submit" class="btn">Sign Up</button>

@@ -49,35 +49,35 @@
                     {% csrf_token %}
                     
                     <div class="row">
-                        {% for day_num, day_name in days_of_week %}
+                        {% for day_data in days_with_schedules %}
                             <div class="col-md-6">
                                 <div class="card day-card">
                                     <div class="card-header">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input day-toggle" type="checkbox" id="day_{{ day_num }}_toggle" name="day_{{ day_num }}_available" 
-                                                {% if schedules|get_item:day_num and schedules|get_item:day_num.is_available %}checked{% endif %}>
-                                            <label class="form-check-label" for="day_{{ day_num }}_toggle">
-                                                <strong>{{ day_name }}</strong>
+                                            <input class="form-check-input day-toggle" type="checkbox" id="day_{{ day_data.day_num }}_toggle" name="day_{{ day_data.day_num }}_available" 
+                                                {% if day_data.is_available %}checked{% endif %}>
+                                            <label class="form-check-label" for="day_{{ day_data.day_num }}_toggle">
+                                                <strong>{{ day_data.day_name }}</strong>
                                             </label>
                                         </div>
                                     </div>
-                                    <div class="card-body day-schedule" id="day_{{ day_num }}_schedule" 
-                                        {% if not schedules|get_item:day_num or not schedules|get_item:day_num.is_available %}style="display: none;"{% endif %}>
+                                    <div class="card-body day-schedule" id="day_{{ day_data.day_num }}_schedule" 
+                                        {% if not day_data.is_available %}style="display: none;"{% endif %}>
                                         
                                         <div class="time-input-group">
-                                            <label for="day_{{ day_num }}_start" class="form-label">Start Time</label>
-                                            <input type="time" class="form-control" id="day_{{ day_num }}_start" name="day_{{ day_num }}_start" 
-                                                value="{{ schedules|get_item:day_num.start_time|default:'09:00' }}">
+                                            <label for="day_{{ day_data.day_num }}_start" class="form-label">Start Time</label>
+                                            <input type="time" class="form-control" id="day_{{ day_data.day_num }}_start" name="day_{{ day_data.day_num }}_start" 
+                                                value="{{ day_data.start_time }}">
                                             
                                             <span class="time-separator">to</span>
                                             
-                                            <label for="day_{{ day_num }}_end" class="form-label">End Time</label>
-                                            <input type="time" class="form-control" id="day_{{ day_num }}_end" name="day_{{ day_num }}_end" 
-                                                value="{{ schedules|get_item:day_num.end_time|default:'17:00' }}">
+                                            <label for="day_{{ day_data.day_num }}_end" class="form-label">End Time</label>
+                                            <input type="time" class="form-control" id="day_{{ day_data.day_num }}_end" name="day_{{ day_data.day_num }}_end" 
+                                                value="{{ day_data.end_time }}">
                                         </div>
                                         
                                         <div class="form-text text-muted">
-                                            Set your working hours for {{ day_name }}
+                                            Set your working hours for {{ day_data.day_name }}
                                         </div>
                                     </div>
                                 </div>

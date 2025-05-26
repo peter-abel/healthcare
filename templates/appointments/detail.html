@@ -3,6 +3,7 @@
 {% block title %}Appointment Details - Healthcare System{% endblock %}
 
 {% block content %}
+
 <div class="row mt-4">
     <div class="col-md-12">
         <nav aria-label="breadcrumb">
@@ -40,6 +41,7 @@
                     
                     <div class="col-md-6">
                         {% if user.patient %}
+                            <!-- When user is a PATIENT, show DOCTOR info -->
                             <h6 class="text-muted">Doctor Information</h6>
                             <hr>
                             <p><strong>Doctor:</strong> {{ appointment.doctor }}</p>
@@ -47,12 +49,18 @@
                             <p><strong>Experience:</strong> {{ appointment.doctor.years_of_experience }} years</p>
                             <p><strong>Fee:</strong> ${{ appointment.doctor.consultation_fee }}</p>
                         {% elif user.doctor %}
+                            <!-- When user is a DOCTOR, show PATIENT info -->
                             <h6 class="text-muted">Patient Information</h6>
                             <hr>
                             <p><strong>Patient:</strong> {{ appointment.patient }}</p>
                             <p><strong>Gender:</strong> {{ appointment.patient.get_gender_display }}</p>
                             <p><strong>Date of Birth:</strong> {{ appointment.patient.date_of_birth }}</p>
                             <p><strong>Phone:</strong> {{ appointment.patient.phone_number }}</p>
+                        {% else %}
+                            <!-- DEBUG: This shouldn't show if your view logic is working -->
+                            <div class="alert alert-warning">
+                                <strong>ERROR:</strong> User has neither patient nor doctor profile!
+                            </div>
                         {% endif %}
                     </div>
                 </div>
