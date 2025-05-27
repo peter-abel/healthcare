@@ -98,16 +98,6 @@ def generate_api_markdown():
             ]
         },
         {
-            'name': 'Medical Records',
-            'endpoints': [
-                {'method': 'GET', 'path': '/api/v1/medical-records/', 'description': 'List user\'s medical records'},
-                {'method': 'POST', 'path': '/api/v1/medical-records/', 'description': 'Create a new medical record'},
-                {'method': 'GET', 'path': '/api/v1/medical-records/{id}/', 'description': 'Get medical record details'},
-                {'method': 'PUT', 'path': '/api/v1/medical-records/{id}/', 'description': 'Update medical record details'},
-                {'method': 'DELETE', 'path': '/api/v1/medical-records/{id}/', 'description': 'Delete a medical record'},
-            ]
-        },
-        {
             'name': 'Authentication',
             'endpoints': [
                 {'method': 'POST', 'path': '/api/v1/auth/token/', 'description': 'Get OAuth2 token'},

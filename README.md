@@ -1,5 +1,7 @@
 # Healthcare Management System
 
+> **Note**: The user interface components and majority of the test suites in this project were developed with the assistance of Claude AI.
+
 A comprehensive healthcare management system for managing patients, doctors, appointments, and medical records.
 
 ## Features
@@ -7,12 +9,180 @@ A comprehensive healthcare management system for managing patients, doctors, app
 - **Patient Management**: Register and manage patient profiles, store basic patient information and contact details, and track patient identification and insurance information.
 - **Doctor Management**: Maintain doctor profiles with specializations and manage doctor availability schedules.
 - **Appointment Scheduling**: Create appointments between patients and doctors, check doctor availability when scheduling, prevent scheduling conflicts and double-bookings, and manage appointment status changes.
-- **Medical Records**: Store medical records for patients, link records to specific appointments, and implement appropriate access controls for sensitive information.
 - **User Interface**: Minimal frontend with Django templates to demonstrate and test the core backend functionalities.
 
 ## Architecture
 
-### Backend Architecture
+### System Architecture
+
+The system follows a modular architecture with clear separation of concerns, illustrated through detailed Entity Relationship and System Flow diagrams:
+
+#### Entity Relationship Diagram
+
+The following diagram shows the complete data model and relationships between system entities:
+
+```mermaid
+erDiagram
+    User ||--o| Profile : has
+    User ||--o| Patient : extends
+    User ||--o| Doctor : extends
+    Doctor ||--o{ DoctorSchedule : has
+    Doctor ||--o{ Appointment : participates
+    Patient ||--o{ Appointment : books
+    Doctor ||--o{ MedicalRecord : creates
+    Patient ||--o{ MedicalRecord : belongs_to
+    Appointment ||--o| MedicalRecord : generates
+
+    User {
+        int id PK
+        string username
+        string email
+        string password
+        string first_name
+        string last_name
+        bool is_active
+    }
+    
+    Profile {
+        int id PK
+        int user_id FK
+        string name
+    }
+    
+    Patient {
+        int id PK
+        int user_id FK
+        date date_of_birth
+        string gender
+        string phone_number
+        text address
+        string emergency_contact_name
+        string emergency_contact_phone
+        string insurance_provider
+        string insurance_policy_number
+        datetime created_at
+        datetime updated_at
+    }
+    
+    Doctor {
+        int id PK
+        int user_id FK
+        string specialization
+        string license_number
+        string phone_number
+        int years_of_experience
+        decimal consultation_fee
+        text bio
+        datetime created_at
+        datetime updated_at
+    }
+    
+    DoctorSchedule {
+        int id PK
+        int doctor_id FK
+        int day_of_week
+        time start_time
+        time end_time
+        bool is_available
+    }
+    
+    Appointment {
+        int id PK
+        int patient_id FK
+        int doctor_id FK
+        date appointment_date
+        time appointment_time
+        string status
+        text reason
+        text notes
+        datetime created_at
+        datetime updated_at
+    }
+    
+    MedicalRecord {
+        int id PK
+        int patient_id FK
+        int doctor_id FK
+        int appointment_id FK
+        text diagnosis
+        text treatment
+        text medications
+        text notes
+        datetime created_at
+    }
+```
+
+#### System Flow Diagram
+
+The following diagram illustrates the main user flows and system processes:
+
+```mermaid
+flowchart TD
+    Start([User Visits Site]) --> Auth{Authenticated?}
+    
+    %% Authentication Flow
+    Auth -->|No| LoginSignup{Login or Signup?}
+    LoginSignup -->|Login| Login[Login Form]
+    LoginSignup -->|Signup| Signup[Signup Form]
+    Signup --> Role{Select Role}
+    Role -->|Patient| PatientSignup[Create Patient Account]
+    Role -->|Doctor| DoctorSignup[Create Doctor Account]
+    PatientSignup --> OTP[Verify OTP]
+    DoctorSignup --> OTP
+    OTP --> CompleteProfile[Complete Profile]
+    Login --> Credentials{Valid Credentials?}
+    Credentials -->|No| LoginError[Show Error]
+    LoginError --> Login
+    Credentials -->|Yes| CheckRole{User Role?}
+    
+    %% Role-based Redirection
+    Auth -->|Yes| CheckRole
+    CheckRole -->|Patient| PatientDashboard[Patient Dashboard]
+    CheckRole -->|Doctor| DoctorDashboard[Doctor Dashboard]
+    
+    %% Patient Flow
+    PatientDashboard --> PatientOptions{Patient Options}
+    PatientOptions -->|View Profile| PatientProfile[Patient Profile]
+    PatientOptions -->|Book Appointment| BookAppointment[Book Appointment]
+    PatientOptions -->|View Appointments| PatientAppointments[View Appointments]
+    PatientOptions -->|View Medical Records| PatientRecords[View Medical Records]
+    
+    BookAppointment --> SelectDoctor[Select Doctor]
+    SelectDoctor --> SelectDateTime[Select Date & Time]
+    SelectDateTime --> ConfirmBooking[Confirm Booking]
+    ConfirmBooking --> AppointmentCreated[Appointment Created]
+    
+    PatientAppointments --> AppointmentOptions{Appointment Options}
+    AppointmentOptions -->|View Details| AppointmentDetails[View Appointment Details]
+    AppointmentOptions -->|Cancel| CancelAppointment[Cancel Appointment]
+    
+    %% Doctor Flow
+    DoctorDashboard --> DoctorOptions{Doctor Options}
+    DoctorOptions -->|View Profile| DoctorProfile[Doctor Profile]
+    DoctorOptions -->|Manage Schedule| ManageSchedule[Manage Schedule]
+    DoctorOptions -->|View Appointments| DoctorAppointments[View Appointments]
+    
+    ManageSchedule --> UpdateSchedule[Update Weekly Schedule]
+    UpdateSchedule --> ScheduleSaved[Schedule Saved]
+    
+    DoctorAppointments --> DoctorAppointmentOptions{Appointment Options}
+    DoctorAppointmentOptions -->|View Details| DoctorAppointmentDetails[View Details]
+    DoctorAppointmentOptions -->|Confirm| ConfirmAppointment[Confirm Appointment]
+    DoctorAppointmentOptions -->|Complete| CompleteAppointment[Complete Appointment]
+    
+    CompleteAppointment --> CreateMedicalRecord[Create Medical Record]
+    CreateMedicalRecord --> MedicalRecordCreated[Medical Record Created]
+    
+    %% Password Reset Flow
+    LoginSignup -->|Forgot Password| ForgotPassword[Forgot Password Form]
+    ForgotPassword --> SendOTP[Send OTP to Email]
+    SendOTP --> VerifyOTP[Verify OTP]
+    VerifyOTP --> ResetPassword[Reset Password Form]
+    ResetPassword --> PasswordReset[Password Reset Complete]
+    PasswordReset --> Login
+```
+
+#### Backend Structure
 
 The system follows a modular architecture with clear separation of concerns:
 
@@ -31,9 +201,8 @@ healthcare/
 1. **API Layer**: RESTful API endpoints for all core functionalities
 2. **Service Layer**: Business logic for each domain
 3. **Data Access Layer**: Models and database interactions
-4. **Authentication Layer**: OAuth 2.0 with JWT tokens
-5. **Caching Layer**: Redis for performance optimization
-6. **Asynchronous Processing**: Celery with Redis as broker
+4. **Caching Layer**: Redis for performance optimization
+5. **Asynchronous Processing**: Celery with Redis as broker
 
 ### Sequence Diagrams
 
@@ -203,7 +372,7 @@ The API follows RESTful principles with the following endpoints:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/healthcare.git
+   git clone https://github.com/peter-abel/healthcare.git
    cd healthcare
    ```
 

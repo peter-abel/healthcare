@@ -8,9 +8,7 @@ from rest_framework import status
 logger = logging.getLogger('django')
 
 def custom_exception_handler(exc, context):
-    """
-    Custom exception handler for DRF that adds more details to the response.
-    """
+    
     # Call REST framework's default exception handler first
     response = exception_handler(exc, context)
     
@@ -90,18 +88,7 @@ def custom_exception_handler(exc, context):
     return response
 
 def get_cached_data(cache_key, timeout, query_function, *args, **kwargs):
-    """
-    Helper function to get data from cache or execute the query function and cache the result.
     
-    Args:
-        cache_key (str): The cache key to use
-        timeout (int): The cache timeout in seconds
-        query_function (callable): The function to execute if cache miss
-        *args, **kwargs: Arguments to pass to the query function
-    
-    Returns:
-        The cached or freshly queried data
-    """
     # Try to get data from cache
     data = cache.get(cache_key)
     
@@ -113,12 +100,7 @@ def get_cached_data(cache_key, timeout, query_function, *args, **kwargs):
     return data
 
 def invalidate_cache_pattern(pattern):
-    """
-    Invalidate all cache keys matching the given pattern.
-    
-    Args:
-        pattern (str): The pattern to match cache keys against
-    """
+  
     # This is a simplified version. In a real-world scenario, you would need
     # to use a more sophisticated approach to find and delete keys matching a pattern.
     # Redis supports the SCAN command for this purpose.

@@ -25,7 +25,6 @@ urlpatterns = [
     
     # Web UI routes
     path('', views.home, name='home'),
-    path('about/', views.about, name='about'),
     path('', include('patients.urls')),
     path('', include('doctors.urls')),
     path('appointments/', include('appointments.urls')),

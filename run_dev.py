@@ -88,30 +88,6 @@ def run_celery_worker():
     time.sleep(2)
     print("Celery worker running.")
 
-def run_celery_beat():
-    """Run Celery beat for scheduled tasks."""
-    global celery_beat_process
-    
-    print("Starting Celery beat...")
-    celery_beat_process = subprocess.Popen(
-        ['celery', '-A', 'healthcare', 'beat', '--loglevel=info'],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        universal_newlines=True,
-        bufsize=1
-    )
-    
-    # Start a thread to read and print beat output
-    from threading import Thread
-    def print_output():
-        for line in celery_beat_process.stdout:
-            print(f"[Celery Beat] {line.strip()}")
-    
-    Thread(target=print_output, daemon=True).start()
-    
-    # Wait for beat to start
-    time.sleep(2)
-    print("Celery beat running.")
 
 def check_redis():
     """Check if Redis is running."""
@@ -149,8 +125,6 @@ def main():
     # Run Celery worker
     run_celery_worker()
     
-    # Run Celery beat
-    run_celery_beat()
     
     print("\nAll services are running. Press Ctrl+C to stop.")
     

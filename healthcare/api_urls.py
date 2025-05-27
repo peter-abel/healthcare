@@ -4,9 +4,9 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
 
-from patients.api import PatientViewSet, MedicalRecordViewSet
 from doctors.api import DoctorViewSet, DoctorScheduleViewSet
 from appointments.api import AppointmentViewSet
+from patients.api import PatientViewSet
 
 # Create a schema view for API documentation
 schema_view = get_schema_view(
@@ -25,7 +25,6 @@ schema_view = get_schema_view(
 # Create a router and register our viewsets with it
 router = DefaultRouter()
 router.register(r'patients', PatientViewSet)
-router.register(r'medical-records', MedicalRecordViewSet)
 router.register(r'doctors', DoctorViewSet)
 router.register(r'doctor-schedules', DoctorScheduleViewSet)
 router.register(r'appointments', AppointmentViewSet)

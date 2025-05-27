@@ -11,9 +11,9 @@ from appointments.models import Appointment
 
 @login_required
 def dashboard(request):
-    """
-    Doctor dashboard view showing today's appointments and upcoming appointments.
-    """
+    
+    #Doctor dashboard view showing today's appointments and upcoming appointments.
+    
     try:
         doctor = request.user.doctor
     except Doctor.DoesNotExist:
@@ -101,9 +101,9 @@ def profile(request):
     return render(request, 'doctors/profile.html', context)
 @login_required
 def manage_schedule(request):
-    """
-    View for managing doctor's weekly schedule.
-    """
+    
+    #View for managing doctor's weekly schedule.
+    
     try:
         doctor = request.user.doctor
     except Doctor.DoesNotExist:
@@ -181,9 +181,9 @@ def manage_schedule(request):
 
 @login_required
 def appointments_list(request):
-    """
-    View for listing all appointments of a doctor.
-    """
+    
+    #View for listing all appointments of a doctor.
+    
     try:
         doctor = request.user.doctor
     except Doctor.DoesNotExist:
@@ -223,44 +223,12 @@ def appointments_list(request):
     
     return render(request, 'doctors/appointments_list.html', context)
 
-def doctor_search(request):
-    """
-    View for searching doctors by specialization and other criteria.
-    """
-    specialization = request.GET.get('specialization', '')
-    min_experience = request.GET.get('experience', '')
-    max_fee = request.GET.get('max_fee', '')
-    
-    doctors = Doctor.objects.all()
-    
-    if specialization:
-        doctors = doctors.filter(specialization=specialization)
-    
-    if min_experience:
-        doctors = doctors.filter(years_of_experience__gte=min_experience)
-    
-    if max_fee:
-        doctors = doctors.filter(consultation_fee__lte=max_fee)
-    
-    # Pagination
-    paginator = Paginator(doctors, 9)  # 9 doctors per page (3x3 grid)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'doctors': page_obj,
-        'specializations': Doctor.SPECIALIZATIONS,
-        'selected_specialization': specialization,
-        'min_experience': int(min_experience) if min_experience else None,
-        'max_fee': max_fee,
-    }
-    
-    return render(request, 'doctors/search.html', context)
+
 
 def doctor_detail(request, doctor_id):
-    """
-    View for viewing a specific doctor's details.
-    """
+    
+    #View for viewing a specific doctor's details.
+    
     doctor = get_object_or_404(Doctor, id=doctor_id)
     schedules = DoctorSchedule.objects.filter(doctor=doctor, is_available=True).order_by('day_of_week')
     

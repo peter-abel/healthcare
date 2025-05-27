@@ -10,9 +10,7 @@ from appointments.models import Appointment
 
 @login_required
 def dashboard(request):
-    """
-    Patient dashboard view showing upcoming appointments and recent medical records.
-    """
+    
     try:
         patient = request.user.patient
     except Patient.DoesNotExist:
@@ -41,9 +39,9 @@ def dashboard(request):
 
 @login_required
 def profile(request):
-    """
-    View for viewing and updating patient profile.
-    """
+    
+    #View for viewing and updating patient profile.
+    
     try:
         patient = request.user.patient
     except Patient.DoesNotExist:
@@ -94,42 +92,3 @@ def profile(request):
     
     return render(request, 'patients/profile.html', context)
 
-@login_required
-def medical_records_list(request):
-    """
-    View for listing all medical records of a patient.
-    """
-    try:
-        patient = request.user.patient
-    except Patient.DoesNotExist:
-        messages.error(request, "You don't have a patient profile.")
-        return redirect('home')
-    
-    medical_records = MedicalRecord.objects.filter(
-        patient=patient
-    ).order_by('-created_at')
-    
-    context = {
-        'medical_records': medical_records,
-    }
-    
-    return render(request, 'patients/medical_records_list.html', context)
-
-@login_required
-def medical_record_detail(request, record_id):
-    """
-    View for viewing a specific medical record.
-    """
-    try:
-        patient = request.user.patient
-    except Patient.DoesNotExist:
-        messages.error(request, "You don't have a patient profile.")
-        return redirect('home')
-    
-    medical_record = get_object_or_404(MedicalRecord, id=record_id, patient=patient)
-    
-    context = {
-        'medical_record': medical_record,
-    }
-    
-    return render(request, 'patients/medical_record_detail.html', context)

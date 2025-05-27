@@ -14,9 +14,7 @@ from healthcare.permissions import IsPatient, IsDoctor, IsPatientOrDoctor, IsAdm
 from healthcare.utils import get_cached_data, invalidate_cache_pattern
 
 class DoctorViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for managing doctors.
-    """
+   
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -24,9 +22,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
     ordering_fields = ['user__last_name', 'user__first_name', 'specialization', 'years_of_experience', 'consultation_fee', 'created_at', 'updated_at']
     
     def get_permissions(self):
-        """
-        Instantiates and returns the list of permissions that this view requires.
-        """
+        
         if self.action == 'create':
             permission_classes = [permissions.AllowAny]
         elif self.action in ['update', 'partial_update', 'destroy']:
@@ -40,18 +36,13 @@ class DoctorViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def get_serializer_class(self):
-        """
-        Return appropriate serializer class based on the action.
-        """
+        
         if self.action == 'create':
             return DoctorCreateSerializer
         return DoctorSerializer
     
     def get_queryset(self):
-        """
-        This view should return a list of all doctors
-        for patients, or just the doctor for the doctor user.
-        """
+       
         user = self.request.user
         
         # Cache key based on user ID and query parameters
@@ -70,27 +61,21 @@ class DoctorViewSet(viewsets.ModelViewSet):
         return get_cached_data(cache_key, settings.DOCTOR_CACHE_TIMEOUT, get_doctors)
     
     def perform_create(self, serializer):
-        """
-        Create a new doctor.
-        """
+        
         doctor = serializer.save()
         
         # Invalidate cache
         invalidate_cache_pattern(f'doctors_user_{doctor.user.id}_*')
     
     def perform_update(self, serializer):
-        """
-        Update a doctor.
-        """
+        
         doctor = serializer.save()
         
         # Invalidate cache
         invalidate_cache_pattern(f'doctors_user_{doctor.user.id}_*')
     
     def perform_destroy(self, instance):
-        """
-        Delete a doctor.
-        """
+       
         # Store ID before deletion for cache invalidation
         user_id = instance.user.id
         
@@ -102,9 +87,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def schedules(self, request, pk=None):
-        """
-        Get schedules for a doctor.
-        """
+       
         doctor = self.get_object()
         
         # Cache key
@@ -122,9 +105,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def appointments(self, request, pk=None):
-        """
-        Get appointments for a doctor.
-        """
+        
         doctor = self.get_object()
         
         # Check permissions
@@ -172,9 +153,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def available_slots(self, request, pk=None):
-        """
-        Get available appointment slots for a doctor.
-        """
+        
         doctor = self.get_object()
         
         # Get query parameters
@@ -230,18 +209,14 @@ class DoctorViewSet(viewsets.ModelViewSet):
         return Response({'date': date, 'available_slots': available_slots})
 
 class DoctorScheduleViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for managing doctor schedules.
-    """
+   
     queryset = DoctorSchedule.objects.all()
     serializer_class = DoctorScheduleSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['day_of_week', 'start_time', 'end_time']
     
     def get_permissions(self):
-        """
-        Instantiates and returns the list of permissions that this view requires.
-        """
+      
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             permission_classes = [IsDoctor]
         elif self.action in ['list', 'retrieve']:
@@ -251,10 +226,7 @@ class DoctorScheduleViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def get_queryset(self):
-        """
-        This view should return a list of all schedules
-        for the currently authenticated doctor.
-        """
+       
         user = self.request.user
         
         # Cache key based on user ID and query parameters
@@ -276,9 +248,9 @@ class DoctorScheduleViewSet(viewsets.ModelViewSet):
         return get_cached_data(cache_key, settings.DOCTOR_CACHE_TIMEOUT, get_schedules)
     
     def perform_create(self, serializer):
-        """
-        Create a new schedule.
-        """
+        
+        #Create a new schedule.
+        
         # Get the doctor from the authenticated user
         doctor = get_object_or_404(Doctor, user=self.request.user)
         
@@ -291,9 +263,9 @@ class DoctorScheduleViewSet(viewsets.ModelViewSet):
         invalidate_cache_pattern(f'available_slots_doctor_{doctor.id}_*')
     
     def perform_update(self, serializer):
-        """
-        Update a schedule.
-        """
+        
+        #Update a schedule.
+        
         schedule = serializer.save()
         
         # Invalidate cache
@@ -302,9 +274,9 @@ class DoctorScheduleViewSet(viewsets.ModelViewSet):
         invalidate_cache_pattern(f'available_slots_doctor_{schedule.doctor.id}_*')
     
     def perform_destroy(self, instance):
-        """
-        Delete a schedule.
-        """
+        
+        #Delete a schedule.
+        
         # Store ID before deletion for cache invalidation
         doctor_id = instance.doctor.id
         user_id = instance.doctor.user.id

@@ -19,9 +19,9 @@ from healthcare.permissions import IsPatient, IsDoctor, IsPatientOrDoctor
 from healthcare.utils import get_cached_data, invalidate_cache_pattern
 
 class AppointmentViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for managing appointments.
-    """
+    
+    #API endpoint for managing appointments.
+    
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -29,9 +29,9 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     ordering_fields = ['appointment_date', 'appointment_time', 'created_at', 'updated_at']
     
     def get_permissions(self):
-        """
-        Instantiates and returns the list of permissions that this view requires.
-        """
+        
+        #Instantiates and returns the list of permissions that this view requires.
+        
         if self.action == 'create':
             permission_classes = [IsPatient]
         elif self.action in ['update', 'partial_update', 'destroy']:
@@ -45,9 +45,9 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def get_serializer_class(self):
-        """
-        Return appropriate serializer class based on the action.
-        """
+        
+        #Return appropriate serializer class based on the action.
+        
         if self.action == 'create' or self.action == 'bulk_create':
             return AppointmentCreateSerializer
         elif self.action in ['update', 'partial_update']:
@@ -55,39 +55,31 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         return AppointmentSerializer
     
     def get_queryset(self):
-        """
-        This view should return a list of all appointments
-        for the currently authenticated user.
-        """
+        
+        #This view should return a list of all appointments
+        #for the currently authenticated user.
+        
         user = self.request.user
         
-        # Cache key based on user ID and query parameters
         cache_key = f'appointments_user_{user.id}_{self.request.query_params}'
         
-        # Define the query function
         def get_appointments():
             if hasattr(user, 'patient'):
-                # User is a patient, return their appointments
                 return Appointment.objects.filter(patient=user.patient)
             elif hasattr(user, 'doctor'):
-                # User is a doctor, return appointments where they are the doctor
                 return Appointment.objects.filter(doctor=user.doctor)
             else:
-                # User is neither a patient nor a doctor
                 return Appointment.objects.none()
         
-        # Get cached data or execute query
         from django.conf import settings
         return get_cached_data(cache_key, settings.APPOINTMENT_CACHE_TIMEOUT, get_appointments)
     
     def perform_create(self, serializer):
-        """
-        Create a new appointment.
-        """
-        # Get the patient from the authenticated user
+        
+        #Create a new appointment.
+        
         patient = get_object_or_404(Patient, user=self.request.user)
         
-        # Save the appointment with the patient
         appointment = serializer.save(patient=patient)
         
         # Invalidate cache
@@ -99,10 +91,9 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         notify_doctor_of_new_appointment.delay(appointment.id)
     
     def perform_update(self, serializer):
-        """
-        Update an appointment.
-        """
-        # Get the old status before saving
+        
+        #Update an appointment.
+        
         old_status = self.get_object().status
         
         # Save the appointment
@@ -122,31 +113,26 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             )
     
     def perform_destroy(self, instance):
-        """
-        Delete an appointment.
-        """
-        # Store IDs before deletion for cache invalidation
+        
+        #Delete an appointment.
+        
         patient_user_id = instance.patient.user.id
         doctor_user_id = instance.doctor.user.id
         
-        # Delete the appointment
         instance.delete()
         
-        # Invalidate cache
         invalidate_cache_pattern(f'appointments_user_{patient_user_id}_*')
         invalidate_cache_pattern(f'appointments_user_{doctor_user_id}_*')
     
     @action(detail=False, methods=['post'])
     def bulk_create(self, request):
-        """
-        Create multiple appointments at once.
-        """
+        
+        #Create multiple appointments at once.
+        
         serializer = AppointmentBulkCreateSerializer(data=request.data)
         if serializer.is_valid():
-            # Get the patient from the authenticated user
             patient = get_object_or_404(Patient, user=request.user)
             
-            # Create appointments
             appointments = []
             for appointment_data in serializer.validated_data['appointments']:
                 appointment = Appointment.objects.create(
@@ -155,12 +141,10 @@ class AppointmentViewSet(viewsets.ModelViewSet):
                 )
                 appointments.append(appointment)
             
-            # Invalidate cache
             invalidate_cache_pattern(f'appointments_user_{request.user.id}_*')
             for appointment in appointments:
                 invalidate_cache_pattern(f'appointments_user_{appointment.doctor.user.id}_*')
             
-            # Return the created appointments
             return Response(
                 AppointmentSerializer(appointments, many=True).data,
                 status=status.HTTP_201_CREATED
@@ -169,26 +153,22 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def confirm(self, request, pk=None):
-        """
-        Confirm an appointment.
-        """
+        
+        #Confirm an appointment.
+        
         appointment = self.get_object()
         
-        # Check if appointment can be confirmed
         if appointment.status != 'SCHEDULED':
             return Response(
                 {'error': 'This appointment cannot be confirmed.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Store old status for notification
         old_status = appointment.status
         
-        # Confirm appointment
         appointment.status = 'CONFIRMED'
         appointment.save()
         
-        # Invalidate cache
         invalidate_cache_pattern(f'appointments_user_{appointment.patient.user.id}_*')
         invalidate_cache_pattern(f'appointments_user_{appointment.doctor.user.id}_*')
         
@@ -205,26 +185,22 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
-        """
-        Mark an appointment as completed.
-        """
+        
+        #Mark an appointment as completed.
+        
         appointment = self.get_object()
         
-        # Check if appointment can be completed
         if appointment.status != 'CONFIRMED':
             return Response(
                 {'error': 'This appointment cannot be marked as completed.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Store old status for notification
         old_status = appointment.status
         
-        # Complete appointment
         appointment.status = 'COMPLETED'
         appointment.save()
         
-        # Invalidate cache
         invalidate_cache_pattern(f'appointments_user_{appointment.patient.user.id}_*')
         invalidate_cache_pattern(f'appointments_user_{appointment.doctor.user.id}_*')
         
@@ -236,24 +212,21 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             appointment.status
         )
         
-        # Return the updated appointment
         return Response(AppointmentSerializer(appointment).data)
     
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
-        """
-        Cancel an appointment.
-        """
+        
+        #Cancel an appointment.
+        
         appointment = self.get_object()
         
-        # Check if appointment can be cancelled
         if appointment.status not in ['SCHEDULED', 'CONFIRMED']:
             return Response(
                 {'error': 'This appointment cannot be cancelled.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Check if appointment is in the past
         if appointment.appointment_date < timezone.now().date():
             return Response(
                 {'error': 'Past appointments cannot be cancelled.'},
@@ -267,7 +240,6 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         appointment.status = 'CANCELLED'
         appointment.save()
         
-        # Invalidate cache
         invalidate_cache_pattern(f'appointments_user_{appointment.patient.user.id}_*')
         invalidate_cache_pattern(f'appointments_user_{appointment.doctor.user.id}_*')
         
@@ -279,24 +251,20 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             appointment.status
         )
         
-        # Return the updated appointment
         return Response(AppointmentSerializer(appointment).data)
     
     @action(detail=False, methods=['get'])
     def upcoming(self, request):
-        """
-        Get upcoming appointments.
-        """
-        # Get base queryset
+        
+        #Get upcoming appointments.
+        
         queryset = self.get_queryset()
         
-        # Filter for upcoming appointments
         upcoming_appointments = queryset.filter(
             appointment_date__gte=timezone.now().date(),
             status__in=['SCHEDULED', 'CONFIRMED']
         ).order_by('appointment_date', 'appointment_time')
         
-        # Paginate and serialize
         page = self.paginate_queryset(upcoming_appointments)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -307,19 +275,16 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def past(self, request):
-        """
-        Get past appointments.
-        """
-        # Get base queryset
+        
+        #Get past appointments.
+        
         queryset = self.get_queryset()
         
-        # Filter for past appointments
         past_appointments = queryset.filter(
             Q(appointment_date__lt=timezone.now().date()) |
             Q(status__in=['COMPLETED', 'CANCELLED', 'NO_SHOW'])
         ).order_by('-appointment_date', '-appointment_time')
         
-        # Paginate and serialize
         page = self.paginate_queryset(past_appointments)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -330,10 +295,9 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def today(self, request):
-        """
-        Get today's appointments.
-        """
-        # Get base queryset
+        
+        #Get today's appointments.
+        
         queryset = self.get_queryset()
         
         # Filter for today's appointments
@@ -341,7 +305,6 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             appointment_date=timezone.now().date()
         ).order_by('appointment_time')
         
-        # Paginate and serialize
         page = self.paginate_queryset(today_appointments)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -350,25 +313,4 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(today_appointments, many=True)
         return Response(serializer.data)
     
-    @action(detail=False, methods=['get'])
-    def analytics(self, request):
-        """
-        Get appointment analytics.
-        """
-        # Check if analytics are cached
-        analytics_json = cache.get('appointment_analytics')
-        
-        if not analytics_json:
-            # Generate analytics asynchronously and return a message
-            from .tasks import generate_appointment_analytics
-            generate_appointment_analytics.delay()
-            
-            return Response({
-                'message': 'Analytics are being generated. Please try again in a few moments.'
-            })
-        
-        # Return the cached analytics
-        import json
-        analytics = json.loads(analytics_json)
-        
-        return Response(analytics)
+    

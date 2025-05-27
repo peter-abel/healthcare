@@ -62,8 +62,8 @@ def book_appointment(request):
             appointment = Appointment(
                 patient=patient,
                 doctor=doctor,
-                appointment_date=appointment_date,  # Now a proper date object
-                appointment_time=appointment_time,  # Now a proper time object
+                appointment_date=appointment_date,  
+                appointment_time=appointment_time,  
                 reason=reason,
                 notes=notes,
                 status='SCHEDULED'

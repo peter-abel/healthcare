@@ -47,7 +47,7 @@
                             <p><strong>Doctor:</strong> {{ appointment.doctor }}</p>
                             <p><strong>Specialization:</strong> {{ appointment.doctor.get_specialization_display }}</p>
                             <p><strong>Experience:</strong> {{ appointment.doctor.years_of_experience }} years</p>
-                            <p><strong>Fee:</strong> ${{ appointment.doctor.consultation_fee }}</p>
+                            <p><strong>Fee:</strong> KES {{ appointment.doctor.consultation_fee }}</p>
                         {% elif user.doctor %}
                             <!-- When user is a DOCTOR, show PATIENT info -->
                             <h6 class="text-muted">Patient Information</h6>

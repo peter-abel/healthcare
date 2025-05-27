@@ -104,7 +104,7 @@
                                     <td>{{ record.doctor }}</td>
                                     <td>{{ record.diagnosis|truncatechars:50 }}</td>
                                     <td>
-                                        <a href="{% url 'medical_record_detail' record.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                        <a href="{% url 'home' %}" class="btn btn-sm btn-outline-primary">View Details</a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -113,7 +113,7 @@
                     </div>
                     {% if medical_records.count > 5 %}
                         <div class="text-center mt-3">
-                            <a href="{% url 'medical_records_list' %}" class="btn btn-outline-primary">View All Records</a>
+                            <a href="{% url 'home' %}" class="btn btn-outline-primary">View All Records</a>
                         </div>
                     {% endif %}
                 {% else %}

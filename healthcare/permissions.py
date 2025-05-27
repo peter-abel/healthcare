@@ -1,9 +1,9 @@
 from rest_framework import permissions
 
 class IsPatient(permissions.BasePermission):
-    """
-    Custom permission to only allow patients to access their own data.
-    """
+    
+    #Custom permission to only allow patients to access their own data.
+    
     def has_permission(self, request, view):
         return hasattr(request.user, 'patient')
     
@@ -17,9 +17,9 @@ class IsPatient(permissions.BasePermission):
         return False
 
 class IsDoctor(permissions.BasePermission):
-    """
-    Custom permission to only allow doctors to access their own data.
-    """
+    
+    #Custom permission to only allow doctors to access their own data.
+    
     def has_permission(self, request, view):
         return hasattr(request.user, 'doctor')
     
@@ -33,9 +33,9 @@ class IsDoctor(permissions.BasePermission):
         return False
 
 class IsPatientOrDoctor(permissions.BasePermission):
-    """
-    Custom permission to allow patients to access their own data and doctors to access data of their patients.
-    """
+    
+    #Custom permission to allow patients to access their own data and doctors to access data of their patients.
+    
     def has_permission(self, request, view):
         return hasattr(request.user, 'patient') or hasattr(request.user, 'doctor')
     
@@ -64,8 +64,8 @@ class IsPatientOrDoctor(permissions.BasePermission):
         return False
 
 class IsAdminUser(permissions.BasePermission):
-    """
-    Custom permission to only allow admin users to access the view.
-    """
+    
+    #Custom permission to only allow admin users to access the view.
+    
     def has_permission(self, request, view):
         return request.user and request.user.is_staff
