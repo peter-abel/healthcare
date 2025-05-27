@@ -2,7 +2,7 @@
 
 > **Note**: The user interface components and majority of the test suites in this project were developed with the assistance of Claude AI.
 
-A comprehensive healthcare management system for managing patients, doctors, appointments, and medical records.
+A comprehensive healthcare management system for managing patients, doctors and appointments, and medical records.
 
 ## Features
 

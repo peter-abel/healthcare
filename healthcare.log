@@ -5385,3 +5385,127 @@ C:\Users\user\Desktop\healthcare\appointments\api.py changed, reloading.
 Watching for file changes with StatReloader
 C:\Users\user\Desktop\healthcare\appointments\urls.py changed, reloading.
 Watching for file changes with StatReloader
+Bad Request: /login/
+Bad Request: /login/
+Unauthorized: /login/
+Unauthorized: /login/
+Bad Request: /forgot/
+Bad Request: /forgot/
+Internal Server Error: /forgot/
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\authenticator\views.py", line 250, in forgot
+    user_reset = User.objects.get(email=email)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\query.py", line 633, in get
+    raise self.model.DoesNotExist(
+django.contrib.auth.models.User.DoesNotExist: User matching query does not exist.
+Unhandled exception: 'str' object has no attribute 'weekday'
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\doctors\api.py", line 207, in available_slots
+    available_slots = get_cached_data(cache_key, settings.APPOINTMENT_CACHE_TIMEOUT, get_available_slots)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\healthcare\utils.py", line 97, in get_cached_data
+    data = query_function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\doctors\api.py", line 168, in get_available_slots
+    day_of_week = date.weekday()
+                  ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'weekday'
+Internal Server Error: /api/v1/doctors/1/available_slots/
+Bad Request: /api/v1/doctor-schedules/
+Bad Request: /login/
+Bad Request: /login/
+Unauthorized: /login/
+Unauthorized: /login/
+Bad Request: /forgot/
+Bad Request: /forgot/
+Internal Server Error: /forgot/
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\authenticator\views.py", line 250, in forgot
+    user_reset = User.objects.get(email=email)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\query.py", line 633, in get
+    raise self.model.DoesNotExist(
+django.contrib.auth.models.User.DoesNotExist: User matching query does not exist.
+Not Found: /api/doctors/1/
+Not Found: /api/doctors/
+Not Found: /api/doctors/
+Not Found: /api/doctors/1/schedules/
+Not Found: /api/doctors/1/
+Not Found: /api/doctors/1/
+Not Found: /api/doctors/
+Not Found: /api/schedules/
+Not Found: /api/schedules/
+Not Found: /api/schedules/1/
+Not Found: /api/schedules/1/
+Not Found: /api/doctors/
+Not Found: /api/schedules/
+Not Found: /api/doctors/1/
+Not Found: /api/schedules/
+Bad Request: /login/
+Bad Request: /login/
+Unauthorized: /login/
+Unauthorized: /login/
+Bad Request: /forgot/
+Bad Request: /forgot/
+Internal Server Error: /forgot/
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\authenticator\views.py", line 250, in forgot
+    user_reset = User.objects.get(email=email)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\query.py", line 633, in get
+    raise self.model.DoesNotExist(
+django.contrib.auth.models.User.DoesNotExist: User matching query does not exist.
+Bad Request: /login/
+Bad Request: /login/
+Unauthorized: /login/
+Unauthorized: /login/
+Bad Request: /forgot/
+Bad Request: /forgot/
+Internal Server Error: /forgot/
+Traceback (most recent call last):
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Desktop\healthcare\authenticator\views.py", line 250, in forgot
+    user_reset = User.objects.get(email=email)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\query.py", line 633, in get
+    raise self.model.DoesNotExist(
+django.contrib.auth.models.User.DoesNotExist: User matching query does not exist.

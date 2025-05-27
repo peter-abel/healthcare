@@ -1,9 +1,7 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 
 class Doctor(models.Model):
     SPECIALIZATIONS = [
@@ -53,6 +51,15 @@ class DoctorSchedule(models.Model):
     class Meta:
         unique_together = ['doctor', 'day_of_week']
         ordering = ['day_of_week', 'start_time']
+    
+    def clean(self):
+        """Validate that end time is after start time"""
+        if self.start_time and self.end_time and self.end_time <= self.start_time:
+            raise ValidationError('End time must be after start time.')
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.doctor} - {self.get_day_of_week_display()} {self.start_time}-{self.end_time}"
