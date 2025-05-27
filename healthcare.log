@@ -5509,3 +5509,4 @@ Traceback (most recent call last):
   File "C:\Users\user\Envs\healthcare\Lib\site-packages\django\db\models\query.py", line 633, in get
     raise self.model.DoesNotExist(
 django.contrib.auth.models.User.DoesNotExist: User matching query does not exist.
+INFO 2025-05-27 13:53:09,556 autoreload 21660 21788 Watching for file changes with StatReloader
