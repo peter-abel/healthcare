@@ -274,54 +274,6 @@ The API follows RESTful principles with the following endpoints:
 - `POST /api/v1/auth/revoke-token/` - Revoke OAuth2 token
 - `POST /api/v1/auth/convert-token/` - Convert token
 
-## Data Modeling
-
-### Database Schema
-
-```
-+----------------+       +----------------+       +----------------+
-|    Patient     |       |    Doctor      |       | DoctorSchedule |
-+----------------+       +----------------+       +----------------+
-| id             |       | id             |       | id             |
-| user           |------>| user           |<------| doctor         |
-| date_of_birth  |       | specialization |       | day_of_week    |
-| gender         |       | license_number |       | start_time     |
-| phone_number   |       | phone_number   |       | end_time       |
-| address        |       | experience     |       | is_available   |
-| emergency_info |       | consultation_fee|       +----------------+
-| insurance_info |       | bio            |
-+----------------+       +----------------+
-        ^                        ^
-        |                        |
-        |                        |
-+----------------+               |
-| MedicalRecord  |               |
-+----------------+               |
-| id             |               |
-| patient        |---------------+
-| doctor         |               |
-| appointment    |---------------+
-| diagnosis      |               |
-| treatment      |               |
-| medications    |               |
-| notes          |               |
-+----------------+               |
-        ^                        |
-        |                        |
-        |                        |
-+----------------+               |
-|  Appointment   |               |
-+----------------+               |
-| id             |               |
-| patient        |---------------+
-| doctor         |
-| date           |
-| time           |
-| status         |
-| reason         |
-| notes          |
-+----------------+
-```
 
 ## Security Implementation
 
@@ -407,17 +359,10 @@ The API follows RESTful principles with the following endpoints:
    celery -A healthcare worker -l info
    ```
 
-8. Start Celery beat for scheduled tasks:
-   ```
-   celery -A healthcare beat -l info
-   ```
 
 ### API Documentation
 
-API documentation is available at:
-- Swagger UI: `/api/v1/docs/`
-- ReDoc: `/api/v1/redoc/`
+API documentation not completed.
 
-## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+
