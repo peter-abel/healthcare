@@ -358,7 +358,8 @@ The API follows RESTful principles with the following endpoints:
    ```
    celery -A healthcare worker -l info
    ```
-
+ **Note**: Replace the EMAIL HOST CONFIG in Settings.py with your own email service to enable authentication.
+ ![alt text](image.png)
 
 ### API Documentation
 
