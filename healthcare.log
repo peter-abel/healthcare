@@ -5510,3 +5510,6 @@ Traceback (most recent call last):
     raise self.model.DoesNotExist(
 django.contrib.auth.models.User.DoesNotExist: User matching query does not exist.
 INFO 2025-05-27 13:53:09,556 autoreload 21660 21788 Watching for file changes with StatReloader
+INFO 2025-05-27 13:53:23,304 basehttp 21660 16180 "GET / HTTP/1.1" 200 5253
+INFO 2025-05-27 13:53:27,006 basehttp 21660 16180 "GET /login/ HTTP/1.1" 200 5138
+INFO 2025-05-27 13:53:32,978 basehttp 21660 16180 "GET / HTTP/1.1" 200 5253
